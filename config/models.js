@@ -1,4 +1,4 @@
 module.exports = {
-  path: __dirname+"/../build/app/iso/stores",
+  path: __dirname+"/../build/app/api/models",
   connection: 'isoBlogMongoDB'
 };

@@ -1,7 +1,7 @@
 var React = require('react')
   , ejs = require('ejs');
 
-var App = require(__dirname+'/iso/components/blog/app');
+var App = require(__dirname+'/front/components/blog/app');
 
 module.exports = function(app) {
 
@@ -15,4 +15,4 @@ module.exports = function(app) {
 
   });
 
-}
+};

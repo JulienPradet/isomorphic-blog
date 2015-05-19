@@ -1,6 +1,7 @@
 var fs = require('fs')
   , Waterline = require('waterline')
-  , Article = require(__dirname + '/../../app/iso/stores/Article');
+  , config = require('app-config')
+  , Article = require(config.models.dir+'/Article');
 
 var orm = Waterline();
 
