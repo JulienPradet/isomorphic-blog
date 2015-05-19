@@ -5,20 +5,17 @@
  */
 module.exports = function(grunt) {
   grunt.config.set('copy', {
-    dev: {
-      files: [{
-        expand: true,
-        cwd: './assets',
-        src: ['**/*.!(jsx|scss)'],
-        dest: '.tmp/public'
-      }]
-    },
     build: {
       files: [{
         expand: true,
-        cwd: '.tmp/public',
-        src: ['**/*'],
-        dest: 'public'
+        cwd: 'src/',
+        src: ['server.js', 'app/**', 'utils/**'],
+        dest: 'build'
+      },
+      {
+        expand: true,
+        src: ['src/assets/**/*'],
+        dest: 'build/public'
       }]
     }
   });

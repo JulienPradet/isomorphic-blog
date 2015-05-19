@@ -11,11 +11,11 @@
 module.exports = function(grunt) {
 
   grunt.config.set('cssmin', {
-    dist: {
+    build: {
       expand: true,
-      cwd: '.tmp/public/styles',
+      cwd: 'build/public/styles',
       src: ['*.css', '!*.min.css'],
-      dest: '.tmp/public/styles'
+      dest: 'build/public/styles'
     }
   });
 

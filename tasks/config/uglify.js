@@ -4,12 +4,12 @@
 module.exports = function(grunt) {
 
   grunt.config.set('uglify', {
-    dist: {
+    build: {
       files: [{
           expand: true,
-          cwd: '.tmp/public/js',
+          cwd: 'build/public/js',
           src: '**/*.js',
-          dest: '.tmp/public/js'
+          dest: 'build/public/js'
       }]
     }
   });

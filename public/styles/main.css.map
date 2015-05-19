@@ -1,7 +1,0 @@
-{
-"version": 3,
-"mappings": "AAEA,IAAK;EACH,UAAU,ECHO,OAAO",
-"sources": ["../../../assets/styles/main.scss","../../../assets/styles/_vars.scss"],
-"names": [],
-"file": "main.css"
-}

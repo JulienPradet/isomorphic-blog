@@ -1,12 +1,19 @@
 module.exports = function(grunt) {
   grunt.config.set('react', {
-    dev: {
+    build: {
       files: [
         {
           expand: true,
-          cwd: 'assets/js/react',
+          cwd: 'build/public/js',
           src: ['**/*.jsx'],
-          dest: '.tmp/public/js',
+          dest: 'build/public/js',
+          ext: '.js'
+        },
+        {
+          expand: true,
+          cwd: 'build/app',
+          src:['**/*.js'],
+          dest: 'build/app',
           ext: '.js'
         }
       ]

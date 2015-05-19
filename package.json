@@ -20,9 +20,16 @@
   "author": "Julien Pradet",
   "license": "MIT",
   "dependencies": {
+    "app-config": "^0.1.4",
+    "ejs": "^2.3.1",
     "express": "4.12.x",
+    "mongodb": "^2.0.32",
+    "newforms": "^0.12.1",
     "react": "^0.13.3",
-    "react-router": "^0.13.3"
+    "react-router": "^0.13.3",
+    "sails-mongo": "^0.11.1",
+    "slug": "^0.9.1",
+    "waterline": "^0.10.21"
   },
   "devDependencies": {
     "grunt": "0.4.x",

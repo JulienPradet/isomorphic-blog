@@ -2,14 +2,14 @@
 module.exports = function(grunt) {
 
   grunt.config.set('sass', {
-    dev: {
+    build: {
       lineNumbers: true,
       sourcemap: 'none',
       files: [{
         expand: true,
-        cwd: 'assets/styles/',
+        cwd: 'build/public/styles/',
         src: ['*.scss'],
-        dest: '.tmp/public/styles/',
+        dest: 'build/public/styles/',
         ext: '.css'
       }]
     }
