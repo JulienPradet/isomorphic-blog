@@ -1,0 +1,39 @@
+{
+  "name": "iso-blog",
+  "version": "0.0.0",
+  "description": "Blog with isomorphic behavior",
+  "readme": "README.md",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "vlynn@ssh-vlynn.alwaysdata.net:~/git/iso-blog.git"
+  },
+  "keywords": [
+    "Blog",
+    "Isomorphic",
+    "Express",
+    "React"
+  ],
+  "author": "Julien Pradet",
+  "license": "MIT",
+  "dependencies": {
+    "express": "4.12.x",
+    "react": "^0.13.3",
+    "react-router": "^0.13.3"
+  },
+  "devDependencies": {
+    "grunt": "0.4.x",
+    "grunt-contrib-clean": "0.6.x",
+    "grunt-contrib-copy": "0.6.x",
+    "grunt-contrib-cssmin": "0.12.x",
+    "grunt-contrib-jshint": "0.11.x",
+    "grunt-contrib-sass": "0.9.x",
+    "grunt-contrib-uglify": "0.9.x",
+    "grunt-contrib-watch": "0.6.x",
+    "grunt-react": "^0.12.2",
+    "include-all": "^0.1.6"
+  }
+}
