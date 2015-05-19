@@ -2,11 +2,10 @@
 node_modules
 
 
-
 /* Automated build */
 .tmp
 .sass-cache
-public
+build
 
 /* Other (ide, clone file, etc.) */
 *~
