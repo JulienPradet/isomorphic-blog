@@ -1,18 +1,16 @@
 var React = require('react')
-  , ejs = require('ejs');
+  , ejs = require('ejs')
+  , config = require('app-config');
 
-var App = require(__dirname+'/front/components/blog/app');
+var App = require(config.path.front+'/components/blog/app');
 
 module.exports = function(app) {
-
-  app.get('*', function(req, res) {
-    var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
+  app.get('/', function(req, res) {
     res.render('index', {
       react: React.renderToString(
-        <App />
+        <App.Blog />
       )
     });
-
   });
 
 };

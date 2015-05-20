@@ -23,7 +23,6 @@ module.exports = function(grunt) {
   function invoke(tasks) {
     for(var task in tasks) {
       for(taskName in tasks[task]) {
-        console.log(taskName);
         tasks[task][taskName](grunt);
       }
     }

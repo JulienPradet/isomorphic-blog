@@ -8,9 +8,10 @@ var express = require('express')
 
 var app = express();
 app.set('view engine', 'ejs');
+app.use('/public', express.static(config.path.public));
 
 /* Configure the server */
-require(config.build.dir+'/app/front/server')(app);
+require(config.path.front+'/server')(app);
 
 var server = app.listen(8080, function() {
     var host = server.address().address;

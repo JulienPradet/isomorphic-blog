@@ -1,13 +1,13 @@
 var React = require('react');
 
-var App = React.createClass({
-  onClick: function() {
+var Blog = React.createClass({
+  onClick: function(event) {
     console.log("BLOG");
   },
   render: function() {
     return (
       <div className="Blog">
-        <button onClick={this.onClick} type="button">
+        <button onClick={this.onClick}>
           Blog
         </button>
       </div>
@@ -15,4 +15,6 @@ var App = React.createClass({
   }
 });
 
-module.exports = App;
+module.exports = {
+  Blog: Blog
+};

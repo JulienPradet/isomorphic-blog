@@ -3,6 +3,6 @@ module.exports = function (grunt) {
     'clean:build',
     'copy:build',
     'sass:build',
-    'react:build',
+    'react:build'
   ]);
 };

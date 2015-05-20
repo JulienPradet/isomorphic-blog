@@ -50,29 +50,29 @@ var Article = Waterline.Collection.extend({
     }
 });
 
-var ArticleForm = forms.Form.extend({
-  title: forms.CharField({
-    required: true,
-    helpText: 'Content of your article'
-  }),
-  content: forms.CharField({
-    required: true,
-    helpText: 'Content of your article',
-    widget: forms.Textarea,
-    validate: function(value) {
-      if(value.length <= 140) {
-        throw forms.ValidationError('Below twitter length : {number_char}', {
-          code: 'twitter_length',
-          params: { number_char: value.length }
-        });
-      }
-    },
-    errorMessages: {
-      required: 'Please add some content, or you users will be bored. :(',
-      twitter_length: 'That sounds more like a tweet than a blog post'
-    }
-  })
-});
+// var ArticleForm = forms.Form.extend({
+//   title: forms.CharField({
+//     required: true,
+//     helpText: 'Content of your article'
+//   }),
+//   content: forms.CharField({
+//     required: true,
+//     helpText: 'Content of your article',
+//     widget: forms.Textarea,
+//     validate: function(value) {
+//       if(value.length <= 140) {
+//         throw forms.ValidationError('Below twitter length : {number_char}', {
+//           code: 'twitter_length',
+//           params: { number_char: value.length }
+//         });
+//       }
+//     },
+//     errorMessages: {
+//       required: 'Please add some content, or you users will be bored. :(',
+//       twitter_length: 'That sounds more like a tweet than a blog post'
+//     }
+//   })
+// });
 
 module.exports = {
   identity: 'article',
@@ -92,6 +92,5 @@ module.exports = {
 
       }
     };
-  },
-  form: ArticleForm
+  }
 };
