@@ -1,11 +1,12 @@
 var slugify = require('slug')
+  , q = require('q')
   , config = require('app-config')
   , Waterline = require('waterline');
 
 var Article = Waterline.Collection.extend({
   
   // Identity is a unique name for this model and must be in lower case
-  identity: 'article',
+  identity: 'user',
 
   // Connection
   // A named connection which will be used to read/write to the datastore
@@ -17,47 +18,47 @@ var Article = Waterline.Collection.extend({
   schema: true,
 
   attributes: {
-    'title': {
+    'username': {
       type: 'string',
-      maxLength: 255
-    },
-    'slug': {
-      type: 'string',
-      maxLength: 255,
-      index: true,
       unique: true,
-      alphanumericdashed: true
+      maxLength: 128
     },
-    'content': {
-      type: 'text'
+    'password': {
+      type: 'string',
+      maxLength: 64
+    },
+    'email': {
+      type: 'email'
     }
   },
-    // toJson method used for the front API
-    toJson: function() {
-      var obj = this.toObject();
-      delete obj.id;
-      return obj;
-    },
 
-    // Makes sure that the slug is alright with the title
-    beforeValidate: function(values, cb) {
-      if(!values.hasOwnProperty('slug')) {
-        /* Sets the slug */
-        values.slug = slugify(values.title);
-      }
-      cb();
-    }
+  // toJson method used for the front API
+  toJson: function() {
+    var obj = this.toObject();
+    delete obj.password;
+    return obj;
+  }
 });
 
 module.exports = {
-  identity: 'article',
-  model: Article,
+  identity: 'user',
+  model: User,
   repository: function(Model) {
     return {
-      getArticles: function(number, page, cb) {
+      getUser: function(username) {
+        var deferred = q.defer();
+
         Model.find()
-          .paginate({page: page, limit: number})
-          .exec(cb);
+          .where({username: username})
+          .exec(function(err, user) {
+            if(err) {
+              deferred.reject(err);
+            } else {
+              deferred.resolve(user);
+            }
+          });
+
+        return deferred;
       },
       getArticleBySlug: function(articleSlug) {
         Model.find()
