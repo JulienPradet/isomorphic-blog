@@ -1,82 +1,192 @@
 var q = require('q')
   , passport = require('passport')
   , BasicStrategy = require('passport-http').BasicStrategy
-  , BearerStrategy = require('passport-http-bearer').Strategy;
+  , BearerStrategy = require('passport-http-bearer').Strategy
+  , bcrypt = require('bcrypt')
+  , forms = require(__dirname+'/forms')
+  , errorHandler = require(__dirname+'/errorHandler');
 
 /**
  * Users currently logged in
  * @type {Array} contains the user id, his token and the roles assigned to him
+ * @todo it'd be better to switch to a database to be stateless (for instance redis since it's memcached)
  */
 var _users = [];
 
 function findByToken(token) {
   var deferred = q.defer();
 
-  for(var i = 0, len = users.length; i < len; i++) {
+  for(var i = 0, len = _users.length; i < len; i++) {
     var user = _users[i];
     if(user.token === token) {
-      deferred.resolve(user);
-      i = -1;
-      break;
+      if(user.expiresAt < (new Date())) {
+        _users.splice(i, 1);
+      } else {
+        deferred.resolve(user);
+        i = -1;
+        break;
+      }
     }
   }
 
-  if(i !== -1)
+  if(i !== -1) {
     deferred.reject();
+  }
 
   return deferred.promise;
 }
 
-function initialize(app) {
-  var deferred = q.defer();
+/**
+ * Authentificate user to allow him to connect by tokens
+ * @param {Array} array of roles the user is allowed to
+ * @return a token for the session of the user
+ */
+function createUserSession(user) {
+  var expiresAt = new Date()
+    , token = Math.random().toString(36).substr(2);
 
-  /**
-   * BasicStrategy
-   * This strategy is used to protect the token endpoint
-   */
-  passport.use(new BasicStrategy(
-    function(username, password, done) {
-      app.models.user.findOne({username: username}, function(err, client) {
-        if (err) { return done(err); }
-        if (!client) { return done(null, false); }
-        if (client.clientSecret != password) { return done(null, false); }
-        return done(null, client);
-      });
-    }
-  ));
+  expiresAt.setMonth(expiresAt.getMonth() + 1);
 
-  /**
-   * BearerStrategy
-   * Allows to authentificate thanks to the token
-   */
-  passport.use(new BearerStrategy(
-    function(token, done) {
-      findByToken(token)
-        .then(function(user) {
-          done(null, user);
-        })
-        .catch(function(error) {
-          done(error, false);
-        })
-        .done();
+  _users.push({
+    token: token,
+    expiresAt: expiresAt,
+    roles: user.roles
+  });
+
+  return token;
+}
+
+function initialize(app, userModelIdentity) {
+  return forms.loadForms(app, './forms')
+    .then(function(app) {
+      app.use(passport.initialize());
+      app.use(passport.session());
+
+      /**
+      * BasicStrategy
+      * This strategy is used to protect the token endpoint
+      */
+      passport.use(new BasicStrategy(
+        function(username, password, done) {
+          app.models[userModelIdentity].findOne({username: username}, function(err, user) {
+            if (err) { return done(err); }
+            if (!user) { return done(null, false); }
+            bcrypt.compare(password, user.password, function(err, res) {
+              if(err || !res) {
+                return done(null, false);
+              } else {
+                return done(null, user);
+              }
+            })
+          });
+        }
+      ));
+
+      /**
+      * BearerStrategy
+      * Allows to authentificate thanks to the token
+      */
+      passport.use(new BearerStrategy(
+        function(token, done) {
+          console.log(token);
+          findByToken(token)
+            .then(function(user) {
+              console.log(user);
+              done(null, user);
+            })
+            .catch(function(error) {
+              console.log(error);
+              done(error, false);
+            })
+            .done();
+        }
+      ));
+
+      /* Adding the login/register routes */
+      app.post(
+        '/register',
+        alreadyLoggedIn, // Make sure that the user is not already logged in
+        function(req, res, next) {
+          var registerForm = app.forms.register();
+          registerForm.bind(req);
+          if(registerForm.validates()) {
+            app.repositories[userModelIdentity].createUser(
+              registerForm.data.username,
+              registerForm.data.password,
+              registerForm.data.email
+            )
+              .then(function(user) {
+                delete user.password;
+                res.json(user);
+              })
+              .fail(function(err) {
+                next();
+              })
+              .done();
+          }
       })
-    }
-  ));
 
-  deferred.resolve(app);
+      app.post(
+        '/login',
+        alreadyLoggedIn, // Make sure that the user is not already logged in
+        passport.authenticate('basic', {session: false}),
+        function(req, res) {
+          var token = createUserSession(req.user);
+          res.json({
+            token: token
+          });
+        }
+      );
 
-  return deferred.promise;
+      return app;
+    });
 }
 
-function middleware(security, options) {
-  return function(req, res, next) {
-    console.info("check auth");
-    console.log(security);
+function hasRole(role, user) {
+  return user.roles.indexOf(role) > -1;
+}
+
+function checkAuthorization(security, options) {
+  return function checkAuthorization(req, res, next) {
+    // You don't have to be logged
+    if(security.hasOwnProperty('logged') && !security.logged) {
+      next();
+    } else {
+      // You have to be logged, but the user is anonymous
+      if((security.logged || security.roles) && !req.user) {
+        throw new errorHandler.UnauthorizedError('You must be logged in.');
+      } else {
+        // You have to be logged, and match some roles
+        if(security.hasOwnProperty('roles')) {
+          // You match one of those roles
+          if(security.roles.some(function(role) { hasRole(role, req.user) })) {
+            next();
+          // You dont match those roles
+          } else {
+            throw new errorHandler.UnauthorizedError('You don\'t have the permission to do that.');
+          }
+        // You only have to be logged (no roles), and you are
+        } else {
+          next();
+        }
+      }
+    }
+  };
+}
+
+function alreadyLoggedIn(req, res, next) {
+  if(req.user) {
+    throw new errorHandler.ForbiddenError('Already logged in');
+  } else {
     next();
   }
 }
 
 module.exports = {
   initialize: initialize,
-  middleware: middleware
+  middleware: {
+    authenticate: passport.authenticate('bearer', {session: false}),
+    checkAuthorization: checkAuthorization,
+    alreadyLoggedIn: alreadyLoggedIn
+  }
 };

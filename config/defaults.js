@@ -1,5 +1,3 @@
 module.exports = {
-  defaults: {
-    migrate: 'alter'
-  }
+  migrate: 'alter'
 };

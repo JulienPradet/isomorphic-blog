@@ -1,12 +1,14 @@
 module.exports = [
   {
-    method: 'GET',
+    method: 'get',
     path: '/admin',
     security: {
-      'roles': ['admin']
+      'logged': true
     },
     handler: function(req, res) {
-      res.send('hi');
+      res.json({
+        content: 'hi'
+      });
     }
   }
 ];

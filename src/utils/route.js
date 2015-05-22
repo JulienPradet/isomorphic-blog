@@ -5,33 +5,32 @@ var utils = require('./utils')
 function addRouterToApp(app, router) {
   var path = router.path;
 
+  // Making 'get' the default method
+  var method;
+  if(router.hasOwnProperty('method')) {
+    method = router.method;
+  } else {
+    method = 'get';
+  }
+
   // Handling security
-  if(router.hasOwnProperty('secruity')) {
+  if(router.hasOwnProperty('security')) {
+    var options = {};
     // Getting the options for the security
     if(router.hasOwnProperty('options')) {
       options = router.options;
     }
-    // Adding the method option in order to limit the auth security to a certain method
-    if(router.hasOwnProperty('method')) {
-      options.method = router.method;
-    }
-    // Getting the middleware
-    var authMiddleware = auth.middleware(router.security, options);
     // Adding the middleware to the stack
-    app.use(path, authMiddleware);
+    app[method](path, auth.middleware.authenticate);
+    app[method](path, auth.middleware.checkAuthorization(router.security, options));
   }
 
   if(router.hasOwnProperty('handler')) {
-    // Making 'get' the default method
-    var method;
-    if(router.hasOwnProperty('method')) {
-      method = router.method;
-    } else {
-      method = 'get';
-    }
     // Adding the route to the express app
     app[method](path, router.handler);
   }
+
+  return app;
 }
 
 /**
@@ -39,19 +38,24 @@ function addRouterToApp(app, router) {
  * @param  {express app} An express app
  * @param  {path} A path to a folder containing the routes
  */
-module.exports = function(app, routes) {
-  return utils.getModules(routes)
-    .then(function(modules) {
-      console.info("Loading routes...".underline);
+module.exports = {
+  initialize: function initialize(app, routes) {
+    return utils.getModules(routes)
+      .then(function(modules) {
+        console.info("Loading routes...".underline);
 
-      var name, router;
-      for(name in modules) {
-        console.info(name);
-        router = modules[name];
-        addRouterToApp(app, router); 
-      }
-      
-      console.info("Done\n".green);
-      return app;
-    });
+        var moduleName, name, router;
+        for(moduleName in modules) {
+          console.log(moduleName);
+          routes = modules[moduleName];
+          for(var name in routes) {
+            router = routes[name];
+            app = addRouterToApp(app, router);
+          }
+        }
+
+        console.info("Done\n".green);
+        return app;
+      });
+    }
 };

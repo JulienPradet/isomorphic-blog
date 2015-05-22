@@ -7,7 +7,9 @@ var app = express();
 /* Link to the database */
 require(config.path.utils+'/orm')(app)
   /* Initializing the routes */
-  .then(require(config.path.api+'/server'))
+  .then(function(app) {
+    return require(config.path.api+'/server')(app);
+  })
   .then(function(app) {
     console.info("Loading API done.".underline.green);
     var server = app.listen(8081, function() {

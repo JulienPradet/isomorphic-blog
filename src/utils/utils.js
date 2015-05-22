@@ -3,17 +3,20 @@ var util = require('util')
   , q = require('q');
 
 /* Get each model from the stores */
-function getModules(modulesPath) {
+function getModules(modulesPath, modules) {
   var deferred = q.defer();
   // Reading all files in the path
   fs.readdir(modulesPath, function(err, files) {
-    var models = {}
-      , name
+    var name
       , module;
+
+    if(typeof modules === "undefined") {
+      modules = {};
+    }
 
     // Error while reading dir
     if(err) {
-      deferred.cancel(err);
+      deferred.reject(err);
 
     // Extract the models from the path
     } else {
@@ -21,11 +24,14 @@ function getModules(modulesPath) {
         if (file.match(/^[A-Za-z0-9-]+\.js$/) !== null) {
           name = file.replace('.js', '');
           module = require(modulesPath + '/' + file);
-          models[name] = module;
+          if(typeof module.name !== "undefined") {
+            name = module.name;
+          }
+          modules[name] = module;
         }
       });
 
-      deferred.resolve(models);
+      deferred.resolve(modules);
     }
   });
 
