@@ -39,7 +39,7 @@ function initOrm(app, config) {
       else {
         /* Making models easily usable */
         app.models = models.collections;
-        
+
         /* Initializing repositories and forms */
         app.repositories = {};
         app.forms = {};
@@ -48,7 +48,7 @@ function initOrm(app, config) {
           app.repositories[model.identity] = model.repository(app.models[model.identity]);
           app.forms[model.identity] = model.form;
         }
-        
+
         /* Remembering connections */
         app.connections = models.connections;
 
@@ -60,15 +60,19 @@ function initOrm(app, config) {
 }
 
 // Start Orm
-function initialize(app) {
+function initialize(app, parameters) {
+  var path = config.path.models;
+  if(typeof parameters !== "undefined" && typeof parameters.path !== "undefined") path = parameters.path;
   /* Load models */
-  return loadModels(config.path.models)
+  return loadModels(path)
     /* Launch the orm and adding the whole things to the app */
     .then(initOrm(app, config))
     .then(function(app) {
-      console.info("Done\n".green);
+      console.info("Done".green);
       return app;
     });
 }
 
-module.exports = initialize;
+module.exports = {
+  initialize: initialize
+};

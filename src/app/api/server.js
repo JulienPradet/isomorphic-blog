@@ -5,11 +5,42 @@ var config = require('app-config')
 module.exports = function(app) {
   app.use(bodyParser.json());
 
-  return require(config.path.utils+'/auth').initialize(app, 'user')
-    .then(function(app) {
-      return require(config.path.utils+'/route').initialize(app, config.path.apiRoutes);
-    })
-    .then(function(app) {
-      return require(config.path.utils+'/errorHandler').initialize(app);
-    });
+  return require(config.path.utils+"/utils").initialize(app, [
+    {
+      name: 'orm',
+      parameters: {
+        path: config.path.models
+      }
+    },
+    {
+      name: 'forms.js',
+      parameters: {
+        path: config.path.forms
+      }
+    },
+    {
+      name: 'auth',
+      parameters: {
+        userModel: 'user',
+        routes: {
+          login: '/login',
+          logout: '/logout',
+          register: '/register'
+        },
+        forms: {
+          login: 'login',
+          register: 'register'
+        }
+      }
+    },
+    {
+      name: 'route',
+      parameters: {
+        path: config.path.apiRoutes
+      }
+    },
+    {
+      name: 'errorHandler',
+    }
+  ]);
 }

@@ -1,6 +1,8 @@
 var util = require('util')
   , fs = require('fs')
-  , q = require('q');
+  , q = require('q')
+  , config = require('app-config')
+  , colors = require('colors');
 
 /* Get each model from the stores */
 function getModules(modulesPath, modules) {
@@ -58,7 +60,27 @@ function promisify(nodeAsyncFn, context) {
   };
 };
 
+/* Makes the initialiasation of the modules in utils declarative */
+function initialize(app, modules) {
+  function initializeAux(app, modules, promise) {
+    if(modules.length === 0) {
+      return promise;
+    } else {
+      var module = modules.splice(0, 1)[0];
+      return initializeAux(app, modules, promise.then(function() {
+        console.log(("\nModule: "+module.name).grey);
+        return require(config.path.utils+'/'+module.name).initialize(app, module.parameters);
+      }));
+    }
+  }
+
+  var deferred = q.defer();
+  deferred.resolve();
+  return initializeAux(app, modules, deferred.promise);
+};
+
 module.exports = {
   getModules: getModules,
-  promisify: promisify
+  promisify: promisify,
+  initialize: initialize
 };

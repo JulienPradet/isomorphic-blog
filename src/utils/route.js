@@ -1,6 +1,10 @@
 var utils = require('./utils')
   , auth = require('./auth')
-  , colors = require('colors');
+  , colors = require('colors')
+  , config = require('app-config')
+  , csrf = require('csurf');
+
+var csrfProtection = csrf({cookie: false});
 
 function addRouterToApp(app, router) {
   var path = router.path;
@@ -23,6 +27,11 @@ function addRouterToApp(app, router) {
     // Adding the middleware to the stack
     app[method](path, auth.middleware.authenticate);
     app[method](path, auth.middleware.checkAuthorization(router.security, options));
+
+    // CSRF protection
+    if(router.hasOwnProperty('csrf')) {
+      app[method](path, csrfProtection);
+    }
   }
 
   if(router.hasOwnProperty('handler')) {
@@ -39,8 +48,12 @@ function addRouterToApp(app, router) {
  * @param  {path} A path to a folder containing the routes
  */
 module.exports = {
-  initialize: function initialize(app, routes) {
-    return utils.getModules(routes)
+  initialize: function initialize(app, parmeters) {
+
+    var path = config.path.apiRoutes;
+    if(typeof parameters !== "undefined" && typeof parameters.path !== "undefined") path = parameters.path;
+
+    return utils.getModules(path)
       .then(function(modules) {
         console.info("Loading routes...".underline);
 
@@ -54,7 +67,7 @@ module.exports = {
           }
         }
 
-        console.info("Done\n".green);
+        console.info("Done".green);
         return app;
       });
     }

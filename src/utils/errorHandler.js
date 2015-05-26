@@ -1,4 +1,5 @@
-var q = require('q');
+var q = require('q')
+  , colors = require('colors');
 
 function HttpResponseError(name, message) {
   this.type = 'http';
@@ -40,6 +41,7 @@ NotFoundError.prototype = NotFoundError.prototype;
 /* Initialize the handing of errors */
 function initialize(app) {
   var deferred = q.defer();
+  console.info("Loading errorHandler...".underline);
 
   app.use(function(err, req, res, next) {
     console.error(err.stack);
@@ -53,7 +55,7 @@ function initialize(app) {
         name: err.name,
         message: err.message
       });
-    } else if(err instanceof ForbiddenError) {
+    } else if(err instanceof ForbiddenError || err.code === 'EBADCSRFTOKEN') {
       res.status(403).json({
         name: err.name,
         message: err.message
@@ -76,6 +78,7 @@ function initialize(app) {
     }
   });
 
+  console.info("Done".green);
   deferred.resolve(app);
 
   return deferred.promise;

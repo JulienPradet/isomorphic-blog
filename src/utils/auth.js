@@ -4,7 +4,8 @@ var q = require('q')
   , BearerStrategy = require('passport-http-bearer').Strategy
   , bcrypt = require('bcrypt')
   , forms = require(__dirname+'/forms')
-  , errorHandler = require(__dirname+'/errorHandler');
+  , errorHandler = require(__dirname+'/errorHandler')
+  , colors = require('colors');
 
 /**
  * Users currently logged in
@@ -56,90 +57,163 @@ function createUserSession(user) {
   return token;
 }
 
-function initialize(app, userModelIdentity) {
-  return forms.loadForms(app, './forms')
-    .then(function(app) {
-      app.use(passport.initialize());
-      app.use(passport.session());
+function removeUserSession(user) {
+  console.log("test");
+  var deferred = q.defer();
 
-      /**
-      * BasicStrategy
-      * This strategy is used to protect the token endpoint
-      */
-      passport.use(new BasicStrategy(
-        function(username, password, done) {
-          app.models[userModelIdentity].findOne({username: username}, function(err, user) {
-            if (err) { return done(err); }
-            if (!user) { return done(null, false); }
-            bcrypt.compare(password, user.password, function(err, res) {
-              if(err || !res) {
-                return done(null, false);
-              } else {
-                return done(null, user);
-              }
-            })
-          });
-        }
-      ));
+  for(var i = 0, len = _users.length; i < len; i++) {
+    var user = _users[i];
+    if(user.token === token) {
+      _users.splice(i, 1);
+      i = -1;
+      deferred.resolve();
+      break;
+    }
+  }
 
-      /**
-      * BearerStrategy
-      * Allows to authentificate thanks to the token
-      */
-      passport.use(new BearerStrategy(
-        function(token, done) {
-          console.log(token);
-          findByToken(token)
-            .then(function(user) {
-              console.log(user);
-              done(null, user);
-            })
-            .catch(function(error) {
-              console.log(error);
-              done(error, false);
-            })
-            .done();
-        }
-      ));
+  if(i !== -1) {
+    deferred.reject('User is not logged in');
+  }
 
-      /* Adding the login/register routes */
-      app.post(
-        '/register',
-        alreadyLoggedIn, // Make sure that the user is not already logged in
-        function(req, res, next) {
-          var registerForm = app.forms.register();
-          registerForm.bind(req);
-          if(registerForm.validates()) {
-            app.repositories[userModelIdentity].createUser(
-              registerForm.data.username,
-              registerForm.data.password,
-              registerForm.data.email
-            )
-              .then(function(user) {
-                delete user.password;
-                res.json(user);
-              })
-              .fail(function(err) {
-                next();
-              })
-              .done();
+  return deferred.promise;
+}
+
+function initialize(app, parameters) {
+  console.info("Loading auth...".underline);
+  // Making sure that the user model is given as a parameter
+  var userModel;
+  if(typeof parameters.userModel !== "undefined") {
+    userModel = parameters.userModel;
+  } else {
+    throw new TypeError('userModel is undefined when initializing authentification');
+  }
+
+  // initializing routes
+  var routes = {
+    login: '/login',
+    logout: '/logout',
+    register: '/register'
+  };
+  if(typeof parameters.routes !== "undefined"){
+    if(typeof parameters.routes.login !== "undefined") routes.login = parameters.routes.login;
+    if(typeof parameters.routes.logout !== "undefined") routes.logout = parameters.routes.logout;
+    if(typeof parameters.routes.register !== "undefined") routes.register = parameters.routes.register;
+  }
+
+  // initializing forms
+  var formsParam = {
+    register: 'register'
+  };
+  if(typeof parameters.forms !== "undefined"){
+    if(typeof parameters.forms.register !== "undefined") formsParam.register = parameters.forms.register;
+  }
+
+  var deferred = q.defer();
+
+  app.use(passport.initialize());
+  app.use(passport.session());
+
+  console.info("stategies...");
+  /**
+  * BasicStrategy
+  * This strategy is used to protect the token endpoint
+  */
+  passport.use(new BasicStrategy(
+    function(username, password, done) {
+      app.models[userModel].findOne({username: username}, function(err, user) {
+        if (err) { return done(err); }
+        if (!user) { return done(null, false); }
+        bcrypt.compare(password, user.password, function(err, res) {
+          if(err || !res) {
+            return done(null, false);
+          } else {
+            return done(null, user);
           }
-      })
+        })
+      });
+    }
+  ));
 
-      app.post(
-        '/login',
-        alreadyLoggedIn, // Make sure that the user is not already logged in
-        passport.authenticate('basic', {session: false}),
-        function(req, res) {
-          var token = createUserSession(req.user);
+  /**
+  * BearerStrategy
+  * Allows to authentificate thanks to the token
+  */
+  passport.use(new BearerStrategy(
+    function(token, done) {
+      console.log(token);
+      findByToken(token)
+        .then(function(user) {
+          console.log(user);
+          done(null, user);
+        })
+        .catch(function(error) {
+          console.log(error);
+          done(error, false);
+        })
+        .done();
+    }
+  ));
+
+  console.info("routes...");
+  /* Adding the login/register routes */
+  app.post(
+    routes.register,
+    alreadyLoggedIn, // Make sure that the user is not already logged in
+    function(req, res, next) {
+      var registerForm = app.forms[formsParam.register]();
+      registerForm.bind(req);
+      if(registerForm.validates()) {
+        app.repositories[userModel].createUser(
+          registerForm.data.username,
+          registerForm.data.password,
+          registerForm.data.email
+        )
+          .then(function(user) {
+            delete user.password;
+            res.json(user);
+          })
+          .fail(function(err) {
+            next();
+          })
+          .done();
+      }
+  });
+
+  app.post(
+    routes.login,
+    alreadyLoggedIn, // Make sure that the user is not already logged in
+    passport.authenticate('basic', {session: false}),
+    function(req, res) {
+      var token = createUserSession(req.user);
+      res.json({
+        token: token
+      });
+    }
+  );
+
+  app.post(
+    routes.logout,
+    passport.authenticate('bearer', {session: false}),
+    function(req, res) {
+      console.log("test");
+      removeUserSession(app.user)
+        .then(function() {
           res.json({
-            token: token
-          });
-        }
-      );
+            message: "Deconnected"
+          })
+        })
+        .fail(function() {
+          throw new errorHandler.ForbiddenError('You are not logged in');
+        })
+        .done();
+    }
+  );
 
-      return app;
-    });
+  console.info("Done".green);
+  deferred.resolve(app);
+
+  return deferred.promise;
+
 }
 
 function hasRole(role, user) {

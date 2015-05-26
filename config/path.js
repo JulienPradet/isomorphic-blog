@@ -9,6 +9,7 @@ module.exports = {
   services: api+'/services',
   models: api+'/models',
   apiRoutes: api+'/routes',
+  forms: api+'/forms',
   front: front,
   public: build+'/public'
 };

@@ -1,8 +1,11 @@
 var validate = require("validate.js")
-  , utils = require('./utils');
+  , utils = require('./utils')
+  , config = require('app-config')
+  , colors = require('colors');
 
-function loadForms(app, routes) {
-  return utils.getModules(__dirname+'/forms')
+function loadForms(app, path) {
+  console.info("Loading forms...".underline);
+  return utils.getModules(path)
     .then(function(modules) {
       var forms = app.forms
         , name
@@ -13,6 +16,7 @@ function loadForms(app, routes) {
       }
 
       for(name in modules) {
+        console.info(name);
         module = modules[name];
         forms[name] = function() {
           return (new Form(module));
@@ -20,6 +24,7 @@ function loadForms(app, routes) {
       }
 
       app.forms = forms;
+      console.info("Done".green);
 
       return app;
     });
@@ -51,7 +56,14 @@ Form.prototype.validates = function validate() {
   });
 }
 
+function initialize(app, parameters){
+  var path = config.path.forms;
+  if(typeof parameters !== "undefined" && typeof parameters.path !== "undefined") path = parameters.path;
+  return loadForms(app, path);
+}
+
 module.exports = {
   Form: Form,
-  loadForms: loadForms
+  loadForms: loadForms,
+  initialize: initialize
 };
