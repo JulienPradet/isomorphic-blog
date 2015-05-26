@@ -2,7 +2,7 @@ var React = require('react')
   , ejs = require('ejs')
   , config = require('app-config');
 
-var Blog = require(config.path.front+'/components/blog/Blog');
+var Blog = require(config.path.front+'/components/Blog');
 
 module.exports = function(app) {
   app.get('/', function(req, res) {

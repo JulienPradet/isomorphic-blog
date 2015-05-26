@@ -1,5 +1,5 @@
 import React from 'react'
-import Form from './../../ui/form/Form'
+import Form from './../ui/form/Form'
 
 export default class Register extends React.Component {
   register(values) {

@@ -48,9 +48,9 @@ export default class Form extends React.Component {
 
   renderFieldset(element) {
     return (
-      <div class="form__fieldset">
+      <fieldset key={element.id} class="form__fieldset">
         {element.fields.map(this.renderForm.bind(this))}
-      </div>
+      </fieldset>
     );
   }
 
@@ -62,7 +62,6 @@ export default class Form extends React.Component {
 
   render() {
     let fields = this.props.fields.map(this.renderForm.bind(this));
-
     return (
       <form action={this.props.action} method={this.props.action}>
         {fields}
