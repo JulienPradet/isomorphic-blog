@@ -14,6 +14,9 @@ module.exports = function(grunt) {
           'build/app/front/stores/**/*.js',
           'build/app/front/main.js'
         ],
+      },
+      options: {
+        debug: true
       }
     }
   });

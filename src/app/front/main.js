@@ -1,6 +1,6 @@
-var React = require('react');
-var App = require('./components/blog/app');
+import React from 'react'
+import Blog from './components/blog/Blog'
 
 var mountNode = document.getElementById("react-container");
 
-React.render(<App.Blog />, mountNode);
+React.render(<Blog />, mountNode);

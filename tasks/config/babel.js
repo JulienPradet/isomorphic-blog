@@ -1,14 +1,14 @@
 module.exports = function(grunt) {
-  grunt.config.set('react', {
+  grunt.config.set('babel', {
     options: {
-      es6module: true
+        sourceMap: true
     },
     build: {
       files: [
         {
           expand: true,
           cwd: 'build/public/js',
-          src: ['**/*.jsx'],
+          src: ['**/*.js'],
           dest: 'build/public/js',
           ext: '.js'
         },
@@ -23,5 +23,5 @@ module.exports = function(grunt) {
     }
   });
 
-  grunt.loadNpmTasks('grunt-react');
+  grunt.loadNpmTasks('grunt-babel');
 }
