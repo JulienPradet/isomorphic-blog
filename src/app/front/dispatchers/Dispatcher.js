@@ -7,7 +7,7 @@ export default class Dispatcher {
 
   register(callback) {
     this._callbacks.push(callback);
-    return _callbacks.length - 1;
+    return this._callbacks.length - 1;
   }
 
   dispatch(payload) {

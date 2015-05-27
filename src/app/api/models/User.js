@@ -46,6 +46,20 @@ module.exports = {
   model: User,
   repository: function(Model) {
     return {
+      getUsers: function() {
+        var deferred = q.defer();
+
+        Model.find()
+          .exec(function(err, users) {
+            if(err) {
+              deferred.reject(err);
+            } else {
+              deferred.resolve(users);
+            }
+          });
+
+        return deferred.promise;
+      },
       getUser: function(username) {
         var deferred = q.defer();
 
@@ -55,7 +69,6 @@ module.exports = {
             if(err) {
               deferred.reject(err);
             } else {
-              user.roles = ['admin'];
               deferred.resolve(user);
             }
           });
@@ -69,14 +82,11 @@ module.exports = {
           if(err) {
             console.log(err);
           } else {
-            console.log(password);
             bcrypt.hash(password, salt, function(err, hash) {
-              console.log("hashed");
               if(err) {
                 console.log(err);
                 deferred.reject(err)
               } else {
-                console.log(hash);
                 Model.create({
                   username: username,
                   password: hash,

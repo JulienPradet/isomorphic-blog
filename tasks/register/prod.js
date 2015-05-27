@@ -1,6 +1,6 @@
 module.exports = function (grunt) {
   grunt.registerTask('prod', [
-    'front',
+    'dev',
     'cssmin:build',
     'uglify:build',
   ]);

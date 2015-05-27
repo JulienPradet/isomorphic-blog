@@ -12,7 +12,7 @@ module.exports = function(grunt) {
           'build/app/front/components/**/*.js',
           'build/app/front/dispatchers/**/*.js',
           'build/app/front/stores/**/*.js',
-          'build/app/front/main.js'
+          'build/app/front/app.js'
         ],
       },
       options: {

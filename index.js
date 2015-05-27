@@ -4,10 +4,10 @@ var express = require('express')
 
 var app = express();
 
-require(config.path.api+'/server')(app)
+require(__dirname+'/build/app/server')(express, app)
   .then(function(app) {
     console.info("\nLoading API done.".underline.green);
-    var server = app.listen(8081, function() {
+    var server = app.listen(8080, function() {
         var host = server.address().address;
         var port = server.address().port;
 

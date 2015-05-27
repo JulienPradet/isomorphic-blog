@@ -6,6 +6,7 @@ node_modules
 .tmp
 .sass-cache
 build
+npm-debug.log
 
 /* Other (ide, clone file, etc.) */
 *~

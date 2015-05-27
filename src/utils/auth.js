@@ -58,7 +58,6 @@ function createUserSession(user) {
 }
 
 function removeUserSession(user) {
-  console.log("test");
   var deferred = q.defer();
 
   for(var i = 0, len = _users.length; i < len; i++) {
@@ -195,7 +194,6 @@ function initialize(app, parameters) {
     routes.logout,
     passport.authenticate('bearer', {session: false}),
     function(req, res) {
-      console.log("test");
       removeUserSession(app.user)
         .then(function() {
           res.json({

@@ -6,8 +6,10 @@ var utils = require('./utils')
 
 var csrfProtection = csrf({cookie: false});
 
-function addRouterToApp(app, router) {
+function addRouterToApp(app, router, urlPrefix) {
   var path = router.path;
+  if(typeof urlPrefix !== "undefined")
+    path = urlPrefix + path;
 
   // Making 'get' the default method
   var method;
@@ -59,11 +61,10 @@ module.exports = {
 
         var moduleName, name, router;
         for(moduleName in modules) {
-          console.log(moduleName);
-          routes = modules[moduleName];
+          routes = modules[moduleName](app);
           for(var name in routes) {
             router = routes[name];
-            app = addRouterToApp(app, router);
+            app = addRouterToApp(app, router, parmeters.urlPrefix);
           }
         }
 

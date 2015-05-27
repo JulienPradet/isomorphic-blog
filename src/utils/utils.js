@@ -62,9 +62,13 @@ function promisify(nodeAsyncFn, context) {
 
 /* Makes the initialiasation of the modules in utils declarative */
 function initialize(app, modules) {
+  var deferred = q.defer();
+
   function initializeAux(app, modules, promise) {
     if(modules.length === 0) {
-      return promise;
+      return promise.then(function(app) {
+        return app;
+      });
     } else {
       var module = modules.splice(0, 1)[0];
       return initializeAux(app, modules, promise.then(function() {
@@ -74,7 +78,6 @@ function initialize(app, modules) {
     }
   }
 
-  var deferred = q.defer();
   deferred.resolve();
   return initializeAux(app, modules, deferred.promise);
 };

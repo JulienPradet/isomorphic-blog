@@ -1,5 +1,5 @@
 module.exports = function (grunt) {
-  grunt.registerTask('front', [
+  grunt.registerTask('dev', [
     'compileAssets',
     'browserify:build'
   ]);

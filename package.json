@@ -5,8 +5,7 @@
   "readme": "README.md",
   "main": "app.js",
   "scripts": {
-    "api": "grunt api && node api-server.js",
-    "front": "grunt front && node front-server.js"
+    "start": "grunt dev && node index.js"
   },
   "repository": {
     "type": "git",
@@ -41,7 +40,9 @@
     "sails-mongo": "^0.11.1",
     "slug": "^0.9.1",
     "validate.js": "^0.7.1",
-    "waterline": "^0.10.21"
+    "waterline": "^0.10.21",
+    "xhr2": "^0.1.2",
+    "xmlhttprequest": "^1.7.0"
   },
   "devDependencies": {
     "babelify": "^6.1.2",
