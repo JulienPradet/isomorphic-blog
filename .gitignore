@@ -5,6 +5,7 @@ node_modules
 /* Automated build */
 .tmp
 .sass-cache
+.sass-cache/**/*
 build
 npm-debug.log
 
