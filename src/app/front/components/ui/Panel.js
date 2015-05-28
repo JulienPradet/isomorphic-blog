@@ -5,7 +5,9 @@ export default class Panel extends React.Component{
 		const panelClass = "panel"+(typeof this.props.type !== "undefined" ? "--"+this.props.type : "")+" panel--"+this.props.size;
 
 		return (
-			<div className={panelClass}>{this.props.children}</div>
+			<div className={panelClass}>
+				{this.props.children}
+			</div>
 		);
 	}
 }
