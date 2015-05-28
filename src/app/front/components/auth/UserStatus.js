@@ -10,9 +10,7 @@ export default class UserStatus extends React.Component {
       );
     } else {
       return (
-        <div className="user">
-          {this.props.user.username}
-        </div>
+        <User user={this.props.user} />
       );
     }
   }

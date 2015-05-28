@@ -3,35 +3,45 @@ import FetchData from '../fetchData'
 
 function AuthStore(dispatchers, constants) {
   let _user = {};
-  let _activeUsers = [];
+  let _users = [];
 
-  function refreshActiveUsers() {
-    let activeUsers = [];
-    FetchData.users.getActiveUsers()
+  function refreshUser() {
+    return FetchData.users.getUsers()
       .then(function(users) {
-        _activeUsers = users;
+        if(users.length > 0) {
+          _user = users[0];
+        } else {
+          _user = {};
+        }
+      })
+      .fail(function(status, response) {
+        console.log("ERROR "+status+": "+response);
+      });
+  }
+
+  function refreshUsers() {
+    return FetchData.users.getUsers()
+      .then(function(users) {
+        _users = users;
         UsersStore.emitChange();
       })
       .fail(function(status, response) {
         console.log("ERROR "+status+": "+response);
       })
-      .done();
-
   }
-  refreshActiveUsers();
 
-  function addActiveUser(user) {
-    if(_activeUsers.every(function(activeUser) {
-      return activeUser.username != user.username;
+  function addUser(user) {
+    if(_users.every(function(user) {
+      return user.username != user.username;
     })) {
-      _activeUsers.push(user);
+      _users.push(user);
     }
   }
 
-  function removeActiveUser(user) {
+  function removeUser(user) {
     for(let index in user) {
       if(user.hasOwnProperty[index] && user[index].id === user.id) {
-        _activeUsers.splice(index, 1);
+        _users.splice(index, 1);
         break;
       }
     }
@@ -44,7 +54,7 @@ function AuthStore(dispatchers, constants) {
   }
 
   UsersStore.getUsers = function() {
-    return _activeUsers;
+    return _users;
   }
 
   UsersStore.emitChange = function() {
@@ -63,11 +73,11 @@ function AuthStore(dispatchers, constants) {
     let actionType = payload.actionType;
     switch(actionType) {
       case constants.auth.LOGIN:
-        addActiveUser(payload.user);
+        addUser(payload.user);
         UsersStore.emitChange();
         break;
       case constants.auth.LOGOUT:
-        removeActiveUser(payload.user);
+        removeUser(payload.user);
         UsersStore.emitChange();
         break;
     }

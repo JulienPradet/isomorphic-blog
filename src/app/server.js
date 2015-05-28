@@ -1,9 +1,9 @@
 import config from 'app-config'
 import bodyParser from 'body-parser'
 import session from 'express-session'
-import React from 'react'
 import ejs from 'ejs'
-import App from './front/components/App'
+import React from 'react'
+import * as RendererWithData from './front/components/RendererWithData'
 import * as context from './front/ContextProvider'
 
 module.exports = function(express, app) {
@@ -53,10 +53,15 @@ module.exports = function(express, app) {
 
   return require(config.path.utils+"/utils").initialize(app, modules)
     .then(function(app){
-      app.get(['/blog', '/blog*'], function(req, res) {
+      app.get(['*'], function(req, res) {
+        // RendererWithData.render(<App context={context} />, function(componentString) {
+        //   res.render('index', {
+        //     react: componentString
+        //   });
+        // });
         res.render('index', {
-          react: React.renderToString(<App context={context} />)
-        });
+          react: ""//React.renderToString(<App />)
+        })
       });
 
       return app;

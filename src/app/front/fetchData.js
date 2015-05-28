@@ -43,7 +43,7 @@ function deleteUrl(url) { return fetchUrl(baseUrl+url, null, "DELETE") };
 
 let FetchData = {
   users: {
-    getActiveUsers: getUrl("/users")
+    getUsers: getUrl("/users")
   }
 };
 

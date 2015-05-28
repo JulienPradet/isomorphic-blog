@@ -12,6 +12,13 @@ export default class AuthManager extends React.Component {
     };
   }
 
+  getDataBindings() {
+    return {
+      user: this.props.AuthStore.refreshUser(),
+      users: this.props.AuthStore.refreshUsers()
+    }
+  }
+
   _resetState() {
     this.setState({
       user: this.props.AuthStore.getUser(),

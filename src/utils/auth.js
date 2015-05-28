@@ -139,14 +139,12 @@ function initialize(app, parameters) {
   */
   passport.use(new BearerStrategy(
     function(token, done) {
-      console.log(token);
       findByToken(token)
         .then(function(user) {
-          console.log(user);
           done(null, user);
         })
         .catch(function(error) {
-          console.log(error);
+          console.error(error);
           done(error, false);
         })
         .done();
