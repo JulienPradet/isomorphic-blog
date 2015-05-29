@@ -31,6 +31,7 @@ export default class AuthManager extends React.Component {
   }
 
   componentDidMount() {
+    this.props.AuthActions.loadUsers();
     this.props.AuthStore.addChangeListener(this._onChange.bind(this));
   }
 
@@ -50,9 +51,5 @@ export default class AuthManager extends React.Component {
         </Panel>
       </div>
     );
-  }
-
-  _onAddClick() {
-    this.props.AuthActions.addUser();
   }
 }

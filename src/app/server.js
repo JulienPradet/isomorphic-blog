@@ -3,8 +3,10 @@ import bodyParser from 'body-parser'
 import session from 'express-session'
 import ejs from 'ejs'
 import React from 'react'
+import Router from 'react-router'
 import * as RendererWithData from './front/components/RendererWithData'
 import * as context from './front/ContextProvider'
+import { routes } from './front/components/App'
 
 module.exports = function(express, app) {
   app.set('view engine', 'ejs');
@@ -53,15 +55,12 @@ module.exports = function(express, app) {
 
   return require(config.path.utils+"/utils").initialize(app, modules)
     .then(function(app){
-      app.get(['*'], function(req, res) {
-        // RendererWithData.render(<App context={context} />, function(componentString) {
-        //   res.render('index', {
-        //     react: componentString
-        //   });
-        // });
-        res.render('index', {
-          react: ""//React.renderToString(<App />)
-        })
+      /* It must be done after the api has been made */
+      app.get('*', function(req, res) {
+        Router.run(routes, req.url, function (Handler) {
+          var react = React.renderToString(<Handler context={context} />);
+          res.render('index', {react: react});
+        });
       });
 
       return app;

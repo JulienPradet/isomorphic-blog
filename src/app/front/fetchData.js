@@ -4,7 +4,7 @@ import XMLHttpRequest from 'xhr2'
 let baseUrl = "http://localhost:8080/api";
 
 function fetchUrl(url, data, method) {
-  return function(success, error) {
+  return function() {
     var deferred = q.defer();
 
     let req = new XMLHttpRequest();
@@ -42,6 +42,12 @@ function putUrl(url, data) { return fetchUrl(baseUrl+url, data, "PUT"); };
 function deleteUrl(url) { return fetchUrl(baseUrl+url, null, "DELETE") };
 
 let FetchData = {
+  auth: {
+    currentUser: getUrl("/me"),
+    login: function(user) { return postUrl("/login", user); },
+    logout: postUrl("/logout"),
+    register: function(user) { return postUrl("/register", user); }
+  },
   users: {
     getUsers: getUrl("/users")
   }

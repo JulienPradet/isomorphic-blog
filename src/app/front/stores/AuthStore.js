@@ -5,31 +5,6 @@ function AuthStore(dispatchers, constants) {
   let _user = {};
   let _users = [];
 
-  function refreshUser() {
-    return FetchData.users.getUsers()
-      .then(function(users) {
-        if(users.length > 0) {
-          _user = users[0];
-        } else {
-          _user = {};
-        }
-      })
-      .fail(function(status, response) {
-        console.log("ERROR "+status+": "+response);
-      });
-  }
-
-  function refreshUsers() {
-    return FetchData.users.getUsers()
-      .then(function(users) {
-        _users = users;
-        UsersStore.emitChange();
-      })
-      .fail(function(status, response) {
-        console.log("ERROR "+status+": "+response);
-      })
-  }
-
   function addUser(user) {
     if(_users.every(function(user) {
       return user.username != user.username;
@@ -72,12 +47,12 @@ function AuthStore(dispatchers, constants) {
   let dispatcherIndex = dispatchers.auth.register(function(payload) {
     let actionType = payload.actionType;
     switch(actionType) {
-      case constants.auth.LOGIN:
-        addUser(payload.user);
+      case constants.auth.REFRESH_CURRENT_USER:
+        _user = payload.user;
         UsersStore.emitChange();
         break;
-      case constants.auth.LOGOUT:
-        removeUser(payload.user);
+      case constants.auth.REFRESH_CURRENT_USERS:
+        _users = payload.users;
         UsersStore.emitChange();
         break;
     }
