@@ -9,7 +9,6 @@ function createInstance(component) {
 function getBindings(component) {
   var instance = createInstance(component);
   React.renderToString(component);
-  console.log(component);
   /*
    * if the component doesn't have any bindings, let's have a look in its children
    * else return its bindings

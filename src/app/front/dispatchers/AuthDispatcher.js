@@ -34,7 +34,6 @@ function AuthDispatcher(constants) {
 
   /* Refresh users */
   dispatcher.handleRefreshCurrentUsers = function(users) {
-    console.log(users);
     this.dispatch({
       actionType: constants.auth.REFRESH_CURRENT_USERS,
       users: users

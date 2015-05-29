@@ -7,22 +7,22 @@ export default class AuthManager extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      user: this.props.AuthStore.getUser(),
-      users: this.props.AuthStore.getUsers()
+      user: this.props.context.stores.auth.getUser(),
+      users: this.props.context.stores.auth.getUsers()
     };
   }
 
   getDataBindings() {
     return {
-      user: this.props.AuthStore.refreshUser(),
-      users: this.props.AuthStore.refreshUsers()
+      user: this.props.context.stores.auth.refreshUser(),
+      users: this.props.context.stores.auth.refreshUsers()
     }
   }
 
   _resetState() {
     this.setState({
-      user: this.props.AuthStore.getUser(),
-      users: this.props.AuthStore.getUsers()
+      user: this.props.context.stores.auth.getUser(),
+      users: this.props.context.stores.auth.getUsers()
     });
   }
 
@@ -31,12 +31,11 @@ export default class AuthManager extends React.Component {
   }
 
   componentDidMount() {
-    this.props.AuthActions.loadUsers();
-    this.props.AuthStore.addChangeListener(this._onChange.bind(this));
+    this.props.context.stores.auth.addChangeListener(this._onChange.bind(this));
   }
 
   componentWillUnmount() {
-    this.props.AuthStore.removeChangeListener(this._onChange.bind(this));
+    this.props.context.stores.auth.removeChangeListener(this._onChange.bind(this));
   }
 
   render() {

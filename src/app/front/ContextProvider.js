@@ -8,18 +8,30 @@ import AuthStore from './stores/AuthStore'
  * conflicts between two apps (especially on the server side)
  */
 
-export const constants = {
-  auth: AuthConstants()
-};
+export default class Context {
+  constructor(initData) {
+    this.constants = {
+      auth: AuthConstants()
+    };
 
-export const dispatchers = {
-  auth: AuthDispatcher(constants)
-};
+    this.dispatchers = {
+      auth: AuthDispatcher(this.constants)
+    };
 
-export const actions = {
-  auth: AuthActions(dispatchers, constants)
-};
+    this.actions = {
+      auth: AuthActions(this.dispatchers, this.constants)
+    };
 
-export const stores = {
-  auth: AuthStore(dispatchers, constants)
-};
+    let stores = {
+      auth: AuthStore
+    };
+    for(var storeName in stores) {
+      if(typeof initData !== "undefined" && typeof initData[storeName] !== "undefined") {
+        stores[storeName] = new stores[storeName](this.dispatchers, this.constants, initData[storeName]);
+      } else {
+        stores[storeName] = new stores[storeName](this.dispatchers, this.constants);
+      }
+    }
+    this.stores = stores;
+  }
+}

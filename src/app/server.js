@@ -5,7 +5,7 @@ import ejs from 'ejs'
 import React from 'react'
 import Router from 'react-router'
 import * as RendererWithData from './front/components/RendererWithData'
-import * as context from './front/ContextProvider'
+import Context from './front/ContextProvider'
 import { routes } from './front/components/App'
 
 module.exports = function(express, app) {
@@ -57,9 +57,17 @@ module.exports = function(express, app) {
     .then(function(app){
       /* It must be done after the api has been made */
       app.get('*', function(req, res) {
+        let initData = {
+          auth: {
+            users: [{username: "l"}]
+          }
+        };
         Router.run(routes, req.url, function (Handler) {
-          var react = React.renderToString(<Handler context={context} />);
-          res.render('index', {react: react});
+          var react = React.renderToString(<Handler context={new Context(initData)} />);
+          res.render('index', {
+            react: react,
+            data: JSON.stringify(initData)
+          });
         });
       });
 

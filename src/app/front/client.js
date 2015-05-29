@@ -2,7 +2,9 @@ import React from 'react'
 import Router from 'react-router'
 import { routes, location } from './components/App'
 
-import * as context from './ContextProvider'
+import Context from './ContextProvider'
+
+let context = new Context(DATA);
 
 let mountNode = document.getElementById("react-container");
 
