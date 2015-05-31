@@ -5,13 +5,10 @@ import Register from './auth/Register'
 import AuthManager from './auth/AuthManager'
 import Panel from './ui/Panel'
 
-let Route = Router.Route
-  , DefaultRoute = Router.DefaultRoute
-  , createRoute = Router.createRoute
-  , RouteHandler = Router.RouteHandler
+let RouteHandler = Router.RouteHandler
   , Link = Router.Link;
 
-export class App extends React.Component {
+export default class App extends React.Component {
   render() {
     return (
       <Panel size={10}>
@@ -38,7 +35,7 @@ function refreshUser() {
       }
       UsersStore.emitChange();
     })
-    .fail(function(status, response) {
+    .catch(function(status, response) {
       console.log("ERROR "+status+": "+response);
     });
 }
@@ -49,16 +46,7 @@ function refreshUsers() {
       _users = users;
       UsersStore.emitChange();
     })
-    .fail(function(status, response) {
+    .catch(function(status, response) {
       console.log("ERROR "+status+": "+response);
     })
 }
-
-export let location = Router.HistoryLocation;
-
-export let routes = (
-  <Route name="app" path="/" handler={App}>
-    <Route name="register" path="register" handler={Register} />
-    <DefaultRoute handler={AuthManager} />
-  </Route>
-);

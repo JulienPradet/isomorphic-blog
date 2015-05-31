@@ -5,13 +5,18 @@ import ejs from 'ejs'
 import React from 'react'
 import Router from 'react-router'
 import * as RendererWithData from './front/components/RendererWithData'
-import Context from './front/ContextProvider'
-import { routes } from './front/components/App'
+import { Context, urlToRequest } from './front/Context'
+import { routes } from './front/routes'
+
 
 module.exports = function(express, app) {
   app.set('view engine', 'ejs');
   app.use('/public', express.static(config.path.public));
   app.use(bodyParser.json());
+
+  app.get('/favicon.ico', function(req, res) {
+    res.send('haha');
+  });
 
   var modules = [
     {
@@ -57,18 +62,23 @@ module.exports = function(express, app) {
     .then(function(app){
       /* It must be done after the api has been made */
       app.get('*', function(req, res) {
-        let initData = {
-          auth: {
-            users: [{username: "l"}]
+        // let initData = {
+        //   auth: {
+        //     users: [{username: "l"}]
+        //   }
+        // };
+        new Context(
+          urlToRequest(req.url),
+          function(context, initData) {
+            Router.run(routes, req.url, function (Handler) {
+              var react = React.renderToString(<Handler context={context} />);
+              res.render('index', {
+                react: react,
+                data: JSON.stringify(initData)
+              });
+            });
           }
-        };
-        Router.run(routes, req.url, function (Handler) {
-          var react = React.renderToString(<Handler context={new Context(initData)} />);
-          res.render('index', {
-            react: react,
-            data: JSON.stringify(initData)
-          });
-        });
+        );
       });
 
       return app;

@@ -12,13 +12,6 @@ export default class AuthManager extends React.Component {
     };
   }
 
-  getDataBindings() {
-    return {
-      user: this.props.context.stores.auth.refreshUser(),
-      users: this.props.context.stores.auth.refreshUsers()
-    }
-  }
-
   _resetState() {
     this.setState({
       user: this.props.context.stores.auth.getUser(),
@@ -32,6 +25,8 @@ export default class AuthManager extends React.Component {
 
   componentDidMount() {
     this.props.context.stores.auth.addChangeListener(this._onChange.bind(this));
+    this.props.context.actions.auth.loadUsers();
+
   }
 
   componentWillUnmount() {

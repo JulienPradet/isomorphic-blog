@@ -169,7 +169,7 @@ function initialize(app, parameters) {
             delete user.password;
             res.json(user);
           })
-          .fail(function(err) {
+          .catch(function(err) {
             next();
           })
           .done();
@@ -198,7 +198,7 @@ function initialize(app, parameters) {
             message: "Deconnected"
           })
         })
-        .fail(function() {
+        .catch(function() {
           throw new errorHandler.ForbiddenError('You are not logged in');
         })
         .done();

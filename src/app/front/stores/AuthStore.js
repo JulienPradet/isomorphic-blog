@@ -16,11 +16,11 @@ export default class AuthStore extends Store {
         let actionType = payload.actionType;
         switch(actionType) {
           case constants.auth.REFRESH_CURRENT_USER:
-            store.set('user', payload.user);
+            this._user = payload.user;
             UsersStore.emitChange();
             break;
           case constants.auth.REFRESH_CURRENT_USERS:
-            store.set('users', payload.users);
+            this._users = payload.users;
             UsersStore.emitChange();
             break;
         }
