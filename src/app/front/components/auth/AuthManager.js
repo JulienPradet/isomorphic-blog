@@ -3,7 +3,10 @@ import Panel from '../ui/Panel'
 import UserStatus from './UserStatus'
 import UsersList from './UsersList'
 
-export default class AuthManager extends React.Component {
+import { bindData } from '../../bindData'
+import AuthFetchers from '../../fetchers/AuthFetchers'
+
+class AuthManager extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -25,8 +28,6 @@ export default class AuthManager extends React.Component {
 
   componentDidMount() {
     this.props.context.stores.auth.addChangeListener(this._onChange.bind(this));
-    this.props.context.actions.auth.loadUsers();
-
   }
 
   componentWillUnmount() {
@@ -47,3 +48,12 @@ export default class AuthManager extends React.Component {
     );
   }
 }
+
+export default bindData(
+  AuthManager,
+  {
+    auth: {
+      users: AuthFetchers.refreshUsers
+    }
+  }
+);

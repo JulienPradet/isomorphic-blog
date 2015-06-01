@@ -2,11 +2,13 @@ import config from 'app-config'
 import bodyParser from 'body-parser'
 import session from 'express-session'
 import ejs from 'ejs'
+
 import React from 'react'
 import Router from 'react-router'
-import * as RendererWithData from './front/components/RendererWithData'
-import { Context, urlToRequest } from './front/Context'
 import { routes } from './front/routes'
+
+import Context from './front/Context'
+import { fetchData } from './front/bindData'
 
 
 module.exports = function(express, app) {
@@ -60,25 +62,25 @@ module.exports = function(express, app) {
 
   return require(config.path.utils+"/utils").initialize(app, modules)
     .then(function(app){
-      /* It must be done after the api has been made */
+      /* It must be done after the api has been made, in order not to override those routes */
       app.get('*', function(req, res) {
-        // let initData = {
-        //   auth: {
-        //     users: [{username: "l"}]
-        //   }
-        // };
-        new Context(
-          urlToRequest(req.url),
-          function(context, initData) {
-            Router.run(routes, req.url, function (Handler) {
-              var react = React.renderToString(<Handler context={context} />);
+        const context = new Context();
+        console.log(context);
+
+        Router.run(routes, function (Handler, state) {
+          /* Fetch the datas needed to render the page */
+          fetchData(context, state.routes)
+            .then(function() {
+              console.log("done");
+              const react = React.renderToString(<Handler context={context} />);
               res.render('index', {
                 react: react,
-                data: JSON.stringify(initData)
+                data: JSON.stringify({})
               });
-            });
-          }
-        );
+            })
+            .done();
+
+        });
       });
 
       return app;

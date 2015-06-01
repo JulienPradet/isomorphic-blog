@@ -1,7 +1,6 @@
 export function getUsers(req, res) {
   req.app.repositories.user.getUsers()
     .then(function(users) {
-      console.log(users);
       res.json(users.map(function(user) {
         delete user.password;
         return user;
