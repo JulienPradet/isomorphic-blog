@@ -8,7 +8,7 @@ import Router from 'react-router'
 import { routes } from './front/routes'
 
 import Context from './front/Context'
-import { fetchData } from './front/bindData'
+import { fetchDataFromRoutes } from './front/bindData'
 
 
 module.exports = function(express, app) {
@@ -65,17 +65,16 @@ module.exports = function(express, app) {
       /* It must be done after the api has been made, in order not to override those routes */
       app.get('*', function(req, res) {
         const context = new Context();
-        console.log(context);
 
-        Router.run(routes, function (Handler, state) {
+        Router.run(routes, req.url, function (Handler, state) {
           /* Fetch the datas needed to render the page */
-          fetchData(context, state.routes)
-            .then(function() {
-              console.log("done");
+          fetchDataFromRoutes(context, state.routes)
+            .then(function(initData) {
+              console.log(initData);
               const react = React.renderToString(<Handler context={context} />);
               res.render('index', {
                 react: react,
-                data: JSON.stringify({})
+                data: JSON.stringify(initData)
               });
             })
             .done();

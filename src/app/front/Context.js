@@ -31,4 +31,12 @@ export default class Context {
       auth: new AuthStore(this.dispatchers, this.constants)
     };
   }
+
+  setInitData(initData) {
+    for(var moduleName in initData) {
+      for(var dataName in initData[moduleName]) {
+        this.stores[moduleName]['_'+dataName] = initData[moduleName][dataName];
+      }
+    }
+  }
 };
