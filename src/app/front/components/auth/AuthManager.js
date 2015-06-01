@@ -28,6 +28,7 @@ class AuthManager extends React.Component {
 
   componentDidMount() {
     this.props.context.stores.auth.addChangeListener(this._onChange.bind(this));
+    this.props.context.actions.auth.loadUsers();
   }
 
   componentWillUnmount() {

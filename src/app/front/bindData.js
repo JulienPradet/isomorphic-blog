@@ -50,20 +50,14 @@ export function fetchDataFromRoutes(context, routes) {
 }
 
 export function bindData(Component, dataBinding) {
-  const result = class extends React.Component {
+  return class extends React.Component {
     constructor(props) {
       super(props)
       this._dataBinding = dataBinding;
     }
 
-    // componentDidMount() {
-    //   fetchDataFromHandler(this.props.context, result);
-    // }
-
     render() {
       return (<Component {...this.props} />);
     }
   }
-
-  return result;
 }

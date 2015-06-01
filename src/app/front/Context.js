@@ -13,18 +13,16 @@ import AuthStore from './stores/AuthStore'
 
 export default class Context {
   constructor() {
-    let key;
-
     this.constants = {
       auth: AuthConstants()
     };
 
     this.dispatchers = {
-      auth: AuthDispatcher(this.constants)
+      auth: new AuthDispatcher(this.constants)
     };
 
     this.actions = {
-      auth: AuthActions(this.dispatchers, this.constants)
+      auth: new AuthActions(this.dispatchers, this.constants)
     };
 
     this.stores = {
@@ -34,9 +32,7 @@ export default class Context {
 
   setInitData(initData) {
     for(var moduleName in initData) {
-      for(var dataName in initData[moduleName]) {
-        this.stores[moduleName]['_'+dataName] = initData[moduleName][dataName];
-      }
+      this.stores[moduleName].setInitData(initData[moduleName]);
     }
   }
 };

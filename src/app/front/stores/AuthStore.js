@@ -2,31 +2,30 @@ import Store from './Store'
 
 export default class AuthStore extends Store {
   constructor(dispatchers, constants, initData) {
-    if(typeof initData === "undefined") {
-      initData = {
-        user: {},
-        users: []
-      };
-    }
-
     super(
       dispatchers.auth,
       constants,
       function(payload) {
         let actionType = payload.actionType;
         switch(actionType) {
-          case constants.auth.REFRESH_CURRENT_USER:
+          case this.constants.auth.REFRESH_CURRENT_USER:
             this._user = payload.user;
-            UsersStore.emitChange();
+            this.emitChange();
             break;
-          case constants.auth.REFRESH_CURRENT_USERS:
+          case this.constants.auth.REFRESH_CURRENT_USERS:
             this._users = payload.users;
-            UsersStore.emitChange();
+            this.emitChange();
             break;
         }
-      },
-      initData
+      }
     );
+
+    this.KEY = Math.random();
+
+    this.setInitData({
+      user: {},
+      users: []
+    });
   }
 
   getUser() {

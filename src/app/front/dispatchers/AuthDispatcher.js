@@ -1,63 +1,67 @@
 import Dispatcher from './Dispatcher'
 
-function dispatchError(dispatcher, actionType) {
-  return function(status, error) {
-    dispatcher.dispatch({
-      actionType: actionType,
+export default class AuthDispatcher extends Dispatcher {
+  constructor(constants) {
+    super();
+    this.constants = constants;
+  }
+
+  /* Refresh User */
+  handleRefreshCurrentUser(user) {
+    this.dispatch({
+      actionType: this.constants.auth.REFRESH_CURRENT_USER,
+      user: user
+    });
+  }
+
+  handleFailedLoadUser(status, error) {
+    this.dispatch({
+      actionType: this.constants.auth.FAILED_LOADING_USER,
+      status: status,
+      error: error
+    });
+  }
+
+  /* Refresh users */
+  handleRefreshCurrentUsers(users) {
+    this.dispatch({
+      actionType: this.constants.auth.REFRESH_CURRENT_USERS,
+      users: users
+    });
+  }
+
+  handleFailedLoadUsers(status, error) {
+    this.dispatch({
+      actionType: this.constants.auth.FAILED_LOADING_USERS,
+      status: status,
+      error: error
+    });
+  }
+
+  /* Register User */
+  handleFailedRegister(status, error) {
+    this.dispatch({
+      actionType: this.constants.auth.FAILED_REGISTER,
+      status: status,
+      error: error
+    });
+  }
+
+  /* Login */
+  handleFailedLogin(status, error) {
+    this.dispatch({
+      actionType: this.constants.auth.FAILED_LOGIN,
+      status: status,
+      error: error
+    });
+  }
+
+  /* Logout */
+  handleFailedLogout(status, error) {
+    this.dispatch({
+      actionType: this.constants.auth.FAILED_LOGOUT,
       status: status,
       error: error
     });
   }
 }
-
-function AuthDispatcher(constants) {
-  let dispatcher = new Dispatcher();
-
-  /* Refresh User */
-  dispatcher.handleRefreshCurrentUser = function(user) {
-    this.dispatch({
-      actionType: constants.auth.REFRESH_CURRENT_USER,
-      user: user
-    });
-  }
-
-  dispatcher.handleFailedLoadUser = dispatchError(
-    this,
-    constants.auth.FAILED_LOADING_USER
-  );
-
-  /* Refresh users */
-  dispatcher.handleRefreshCurrentUsers = function(users) {
-    this.dispatch({
-      actionType: constants.auth.REFRESH_CURRENT_USERS,
-      users: users
-    })
-  }
-
-  dispatcher.handleFailedLoadUsers = dispatchError(
-    this,
-    constants.auth.FAILED_LOADING_USERS
-  );
-
-  /* Register User */
-  dispatcher.handleFailedRegister = dispatchError(
-    this,
-    constants.auth.FAILED_REGISTER
-  );
-
-  /* Login */
-  dispatcher.handleFailedLogin = dispatchError(
-    this,
-    constants.auth.FAILED_LOGIN
-  );
-
-  /* Logout */
-  dispatcher.handleFailedLogout = dispatchError(
-    this,
-    constants.auth.FAILED_LOGOUT
-  );
-
-  return dispatcher;
-}
-
-export default AuthDispatcher;

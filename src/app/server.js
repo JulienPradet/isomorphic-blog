@@ -70,7 +70,6 @@ module.exports = function(express, app) {
           /* Fetch the datas needed to render the page */
           fetchDataFromRoutes(context, state.routes)
             .then(function(initData) {
-              console.log(initData);
               const react = React.renderToString(<Handler context={context} />);
               res.render('index', {
                 react: react,
