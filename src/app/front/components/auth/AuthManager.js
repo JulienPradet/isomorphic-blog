@@ -10,15 +10,13 @@ class AuthManager extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      user: this.props.context.stores.auth.getUser(),
-      users: this.props.context.stores.auth.getUsers()
+      user: this.props.context.stores.auth.getUser()
     };
   }
 
   _resetState() {
     this.setState({
-      user: this.props.context.stores.auth.getUser(),
-      users: this.props.context.stores.auth.getUsers()
+      user: this.props.context.stores.auth.getUser()
     });
   }
 
@@ -28,7 +26,6 @@ class AuthManager extends React.Component {
 
   componentDidMount() {
     this.props.context.stores.auth.addChangeListener(this._onChange.bind(this));
-    this.props.context.actions.auth.loadUsers();
   }
 
   componentWillUnmount() {
@@ -39,11 +36,7 @@ class AuthManager extends React.Component {
     return (
       <div>
         <Panel type="full" size={10}>
-            <UserStatus user={this.state.user} />
-        </Panel>
-
-        <Panel size={10}>
-            <UsersList users={this.state.users} />
+            <UserStatus context={this.props.context} user={this.state.user} />
         </Panel>
       </div>
     );
@@ -54,7 +47,7 @@ export default bindData(
   AuthManager,
   {
     auth: {
-      users: AuthFetchers.refreshUsers
+      user: AuthFetchers.refreshUser
     }
   }
 );

@@ -1,8 +1,9 @@
 @import "_vars.scss";
 
-@import "ui/_layout.scss";
-
 body {
   background: $background-color;
   color: $color;
 }
+
+@import "ui/_layout.scss";
+@import "ui/_form.scss";

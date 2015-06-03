@@ -10,7 +10,6 @@ import { routes } from './front/routes'
 import Context from './front/Context'
 import { fetchDataFromRoutes } from './front/bindData'
 
-
 module.exports = function(express, app) {
   app.set('view engine', 'ejs');
   app.use('/public', express.static(config.path.public));
@@ -70,6 +69,8 @@ module.exports = function(express, app) {
           /* Fetch the datas needed to render the page */
           fetchDataFromRoutes(context, state.routes)
             .then(function(initData) {
+              context.setInitData(initData);
+
               const react = React.renderToString(<Handler context={context} />);
               res.render('index', {
                 react: react,

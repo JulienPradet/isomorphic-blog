@@ -2,10 +2,6 @@ import React from 'react'
 import Form from './../ui/form/Form'
 
 export default class Register extends React.Component {
-  register(values) {
-
-  }
-
   render() {
     const fields = [
       {
@@ -16,18 +12,25 @@ export default class Register extends React.Component {
       {
         id: 'password',
         label: "Password",
-        type: 'text'
+        type: 'password'
       },
       {
         id: 'email',
         label: "Email",
-        type: 'text',
-        defaultValue: "test@gmail.com"
+        type: 'email',
+        defaultValue: 'a@a.ac'
+      }
+    ];
+    const buttons = [
+      {
+        id: 'signin',
+        type: 'submit',
+        label: 'Sign in'
       }
     ];
 
     return (
-      <Form method="POST" action="/register" fields={fields} onSubmit={this.register.bind(this)}></Form>
+      <Form method="POST" action="/register" fields={fields} buttons={buttons} onSubmit={this.props.onRegister} ></Form>
     );
   }
 }

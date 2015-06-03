@@ -1,7 +1,7 @@
 import Store from './Store'
 
 export default class AuthStore extends Store {
-  constructor(dispatchers, constants, initData) {
+  constructor(dispatchers, constants) {
     super(
       dispatchers.auth,
       constants,
@@ -19,8 +19,6 @@ export default class AuthStore extends Store {
         }
       }
     );
-
-    this.KEY = Math.random();
 
     this.setInitData({
       user: {},

@@ -1,70 +1,93 @@
 import React from 'react'
 import isUrl from './../../PropTypes'
-import objectPath from 'object-path'
 import Input from './Input'
 
 export default class Form extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = this._defaultValues(props.fields);
   }
 
-  changeHandler(path, value) {
-    let state = this.state;
-    objectPath.set(state, path, value);
-    this.setState(state);
-  }
-
-  submit() {
-    function merge(object, fill) {
-      for(let key in fill) {
-        if(fill.hasOwnProperty(key)) {
-          if(!object.hasOwnProperty(key)) {
-            object[key] = fill[key].defaultValue;
-          } else {
-            if(typeof object[key] === "object" && object[key] !== null
-                && Array.isArray(fill[key].fields)) {
-              object[key] = merge(object[key], fill[key].fields);
-            }
-          }
-        }
+  changeHandler(path) {
+    function push(obj, path, value) {
+      if(typeof obj === "undefined") obj = {};
+      if(path.length <= 0) {
+        throw new Error('invalid path');
+      } else if(path.length === 1) {
+        obj[path[0]] = value;
+      } else {
+        obj[path[0]] = push(obj[path[0]], path.slice(0, 1), value);
       }
-      return object;
+      return obj;
     }
 
-    const submitValues = merge(this.state, this.props.defaultValues);
-    this.props.submit(submitValues);
+    return (function(value) {
+      const state = push(this.state, path, value);
+      this.setState(state);
+    }).bind(this);
   }
 
-  renderForm(element) {
+
+  _defaultValues(fields) {
+    let defaultValues = {};
+    this.props.fields
+      .forEach(((field) => {
+        if(field.hasOwnProperty('defaultValue')) {
+          defaultValues[field.id] = field.defaultValue;
+        } else if(field.hasOwnProperty('fields')) {
+          defaultValues[field.id] = this._defaultValues(field.fields);
+        }
+      }).bind(this));
+    return defaultValues;
+  }
+
+  submit(event) {
+    event.preventDefault();
+    this.props.onSubmit(this.state);
+  }
+
+  renderForm(path, element) {
+    path.push(element.id);
     switch(element.type) {
       case 'fieldset':
-        return this.renderFieldset(element);
+        return this.renderFieldset(path, element);
         break;
       default:
-        return this.renderInput(element)
+        return this.renderInput(path, element)
     }
   }
 
-  renderFieldset(element) {
+  renderFieldset(path, element) {
     return (
       <fieldset key={element.id} class="form__fieldset">
-        {element.fields.map(this.renderForm.bind(this))}
+        {element.fields.map((element) => this.renderForm.bind(this)(path, element))}
       </fieldset>
     );
   }
 
-  renderInput(element) {
+  renderInput(path, element) {
     return (
-      <Input key={element.id} id={element.id} label={element.label} value={element.defaultValue} type={element.type} onChange={this.changeHandler.bind(this)} />
+      <Input key={element.id} id={element.id} label={element.label} value={element.defaultValue} type={element.type} onChange={this.changeHandler.bind(this)(path)} />
+    );
+  }
+
+  renderButton(button) {
+    return (
+      <button key={button.id} type={button.type}>{button.label}</button>
     );
   }
 
   render() {
-    let fields = this.props.fields.map(this.renderForm.bind(this));
+    const fields = this.props.fields.map((element) => this.renderForm.bind(this)([], element));
+    const buttons = (
+      typeof this.props.buttons !== "undefined" ?
+        this.props.buttons.map(this.renderButton.bind(this)) :
+        renderButton()
+    );
     return (
-      <form action={this.props.action} method={this.props.action}>
+      <form className="form" action={this.props.action} method={this.props.method} onSubmit={this.submit.bind(this)}>
         {fields}
+        {buttons}
       </form>
     );
   }

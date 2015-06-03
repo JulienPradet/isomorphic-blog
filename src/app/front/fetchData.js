@@ -3,8 +3,8 @@ import XMLHttpRequest from 'xhr2'
 
 let baseUrl = "http://localhost:8080/api";
 
-function fetchUrl(url, data, method) {
-  return function() {
+function fetchUrl(url, method) {
+  return function(data) {
     var deferred = q.defer();
 
     let req = new XMLHttpRequest();
@@ -26,7 +26,7 @@ function fetchUrl(url, data, method) {
     };
 
     // Launch request
-    if(data === null) {
+    if(data === null || typeof data === "undefined") {
       req.send(null);
     } else {
       req.send(JSON.stringify(data));
@@ -36,20 +36,20 @@ function fetchUrl(url, data, method) {
   }
 };
 
-function getUrl(url) { return fetchUrl(baseUrl+url, null, "GET")};
+function getUrl(url) { return fetchUrl(baseUrl+url, "GET")};
 
-function postUrl(url, data) { return fetchUrl(baseUrl+url, data, "POST"); };
+function postUrl(url) { return fetchUrl(baseUrl+url, "POST"); };
 
-function putUrl(url, data) { return fetchUrl(baseUrl+url, data, "PUT"); };
+function putUrl(url) { return fetchUrl(baseUrl+url, "PUT"); };
 
-function deleteUrl(url) { return fetchUrl(baseUrl+url, null, "DELETE") };
+function deleteUrl(url) { return fetchUrl(baseUrl+url, "DELETE"); };
 
 let FetchData = {
   auth: {
     currentUser: getUrl("/me"),
-    login: function(user) { return postUrl("/login", user); },
+    login: postUrl("/login"),
     logout: postUrl("/logout"),
-    register: function(user) { return postUrl("/register", user); }
+    register: postUrl("/register")
   },
   users: {
     getUsers: getUrl("/users")

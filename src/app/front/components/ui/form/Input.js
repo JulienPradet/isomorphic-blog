@@ -1,16 +1,29 @@
 import React from 'react'
 
 export default class Input extends React.Component {
+  change(event) {
+    this.props.onChange(event.target.value);
+  }
+
   render() {
-    function renderInput(type, id, defaultValue) {
+    function renderInput(type, id, defaultValue, onChange) {
       switch(type) {
         case 'text':
           return (
-            <input type="text" name={id} id={id} value={defaultValue} />
+            <input type="text" name={id} id={id} value={defaultValue} onChange={onChange} />
+          );
+          break;
+        case 'password':
+          return(
+            <input type="password" name={id} id={id} value={defaultValue} onChange={onChange} />
+          );
+        case 'email':
+          return(
+            <input type="email" name={id} id={id} value={defaultValue} onChange={onChange} />
           );
       }
     }
-    const input = renderInput(this.props.type, this.props.id, this.props.defaultValue);
+    const input = renderInput(this.props.type, this.props.id, this.props.defaultValue, this.change.bind(this));
 
     return (
       <div className="form__group">

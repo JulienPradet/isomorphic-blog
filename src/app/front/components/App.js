@@ -13,8 +13,12 @@ export default class App extends React.Component {
     return (
       <Panel size={10}>
         <Panel size={3}>
-          <Link to="/">Home</Link>
-          <Link to="/register">Register</Link>
+          <Panel size={10} type="full">
+            <ul>
+              <li><Link to="/">Home</Link></li>
+              <li><Link to="/register">Register</Link></li>
+            </ul>
+          </Panel>
           <AuthManager context={this.props.context} />
         </Panel>
         <Panel size={7}>
