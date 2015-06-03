@@ -1,5 +1,5 @@
 import React from 'react'
-import User from './User'
+import User from './Username'
 
 import { bindData } from '../../bindData'
 import AuthFetchers from '../../fetchers/AuthFetchers'
@@ -29,6 +29,7 @@ class UsersList extends React.Component {
   componentWillUnmount() {
     this.props.context.stores.auth.removeChangeListener(this._onChange.bind(this));
   }
+
   render() {
     let users = this.state.users.map(function(user) {
       return (<li key={user.username}><User user={user} /></li>);
@@ -46,6 +47,7 @@ class UsersList extends React.Component {
 }
 
 export default bindData(
+  'UsersList',
   UsersList,
   {
     auth: {

@@ -2,6 +2,10 @@ import React from 'react'
 import Form from './../ui/form/Form'
 
 export default class Register extends React.Component {
+  register(values) {
+    this.props.AuthActions.register(values);
+  }
+
   render() {
     const fields = [
       {
@@ -23,14 +27,14 @@ export default class Register extends React.Component {
     ];
     const buttons = [
       {
-        id: 'signin',
+        id: 'signup',
         type: 'submit',
-        label: 'Sign in'
+        label: 'Sign up'
       }
     ];
 
     return (
-      <Form method="POST" action="/register" fields={fields} buttons={buttons} onSubmit={this.props.onRegister} ></Form>
+      <Form method="POST" action="/register" fields={fields} buttons={buttons} onSubmit={this.register.bind(this)} ></Form>
     );
   }
 }

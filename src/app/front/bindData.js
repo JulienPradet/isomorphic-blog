@@ -49,10 +49,11 @@ export function fetchDataFromRoutes(context, routes) {
     });
 }
 
-export function bindData(Component, dataBinding) {
+export function bindData(displayName, Component, dataBinding) {
   return class extends React.Component {
     constructor(props) {
-      super(props)
+      super(props);
+      this.displayName = displayName;
       this._dataBinding = dataBinding;
     }
 

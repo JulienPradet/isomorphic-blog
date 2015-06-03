@@ -1,7 +1,6 @@
 import React from 'react'
+import { RouteHandler } from 'react-router'
 import Panel from '../ui/Panel'
-import UserStatus from './UserStatus'
-import UsersList from './UsersList'
 
 import { bindData } from '../../bindData'
 import AuthFetchers from '../../fetchers/AuthFetchers'
@@ -10,12 +9,14 @@ class AuthManager extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      users: this.props.context.stores.auth.getUsers(),
       user: this.props.context.stores.auth.getUser()
     };
   }
 
   _resetState() {
     this.setState({
+      users: this.props.context.stores.auth.getUsers(),
       user: this.props.context.stores.auth.getUser()
     });
   }
@@ -34,19 +35,17 @@ class AuthManager extends React.Component {
 
   render() {
     return (
-      <div>
-        <Panel type="full" size={10}>
-            <UserStatus context={this.props.context} user={this.state.user} />
-        </Panel>
-      </div>
+      <RouteHandler AuthActions={this.props.context.actions.auth} user={this.state.user} users={this.state.users} />
     );
   }
 }
 
 export default bindData(
+  'AuthManager',
   AuthManager,
   {
     auth: {
+      users: AuthFetchers.refreshUsers,
       user: AuthFetchers.refreshUser
     }
   }

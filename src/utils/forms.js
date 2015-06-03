@@ -45,6 +45,7 @@ Form.prototype.bind = function bind(req) {
     }
   });
   this.data = data;
+  return data;
 }
 
 Form.prototype.validates = function validate() {

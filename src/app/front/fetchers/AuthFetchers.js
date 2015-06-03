@@ -4,12 +4,13 @@ export default {
   refreshUser: function refreshUser() {
     return FetchData.users.getUsers()
       .then(function(users) {
+        let user;
         if(users.length > 0) {
-          _user = users[0];
+          user = users[0];
         } else {
-          _user = {};
+          user = {};
         }
-        return _user;
+        return user;
       });
   },
 

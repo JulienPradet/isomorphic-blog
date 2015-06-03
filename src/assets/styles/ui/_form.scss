@@ -9,7 +9,14 @@
 
 .form__label, .form__input {
   display: table-cell;
-  padding: 5px;
+}
+
+.form__label {
+  padding: 5px 5px 5px 0;
+}
+
+.form__input {
+  padding: 5px 0 5px 5px;
 }
 
 .form__input input {
