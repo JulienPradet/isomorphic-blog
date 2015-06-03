@@ -1,18 +1,18 @@
-var utils = require('./utils')
-  , auth = require('./auth')
-  , colors = require('colors')
-  , config = require('app-config')
-  , csrf = require('csurf');
+import utils from './utils'
+import auth from './auth'
+import colors from 'colors'
+import config from 'app-config'
+import csrf from 'csurf'
 
-var csrfProtection = csrf({cookie: false});
+let csrfProtection = csrf({cookie: false});
 
 function addRouterToApp(app, router, urlPrefix) {
-  var path = router.path;
+  let path = router.path;
   if(typeof urlPrefix !== "undefined")
     path = urlPrefix + path;
 
   // Making 'get' the default method
-  var method;
+  let method;
   if(router.hasOwnProperty('method')) {
     method = router.method;
   } else {
@@ -21,7 +21,7 @@ function addRouterToApp(app, router, urlPrefix) {
 
   // Handling security
   if(router.hasOwnProperty('security')) {
-    var options = {};
+    let options = {};
     // Getting the options for the security
     if(router.hasOwnProperty('options')) {
       options = router.options;
@@ -49,27 +49,25 @@ function addRouterToApp(app, router, urlPrefix) {
  * @param  {express app} An express app
  * @param  {path} A path to a folder containing the routes
  */
-module.exports = {
-  initialize: function initialize(app, parmeters) {
+export function initialize(app, parmeters) {
 
-    var path = config.path.apiRoutes;
-    if(typeof parameters !== "undefined" && typeof parameters.path !== "undefined") path = parameters.path;
+  let path = config.path.apiRoutes;
+  if(typeof parameters !== "undefined" && typeof parameters.path !== "undefined") path = parameters.path;
 
-    return utils.getModules(path)
-      .then(function(modules) {
-        console.info("Loading routes...".underline);
+  return utils.getModules(path)
+    .then(function(modules) {
+      console.info("Loading routes...".underline);
 
-        var moduleName, name, router;
-        for(moduleName in modules) {
-          routes = modules[moduleName](app);
-          for(var name in routes) {
-            router = routes[name];
-            app = addRouterToApp(app, router, parmeters.urlPrefix);
-          }
+      let moduleName, name, routes, router;
+      for(moduleName in modules) {
+        routes = modules[moduleName](app);
+        for(name in routes) {
+          router = routes[name];
+          app = addRouterToApp(app, router, parmeters.urlPrefix);
         }
+      }
 
-        console.info("Done".green);
-        return app;
-      });
-    }
-};
+      console.info("Done".green);
+      return app;
+    });
+}

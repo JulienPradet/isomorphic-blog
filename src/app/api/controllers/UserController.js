@@ -1,4 +1,4 @@
-import { InternalServerError, BadRequest } from '../../../utils/errorHandler'
+import { InternalServerError, BadRequestError } from '../../../utils/errorHandler'
 
 export function getUsers(req, res) {
   req.app.repositories.user.getUsers()
@@ -31,6 +31,6 @@ export function register(req, res) {
       })
       .done();
   } else {
-    form.getErrors();
+    throw new BadRequestError(form.errors);
   }
 }

@@ -15,6 +15,7 @@ require(__dirname+'/build/app/server')(express, app)
     });
   })
   .catch(function(error) {
+    console.log(error);
     console.error(("Failed to load API").red);
     console.trace(error);
   })

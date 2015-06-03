@@ -3,6 +3,8 @@ import bodyParser from 'body-parser'
 import session from 'express-session'
 import ejs from 'ejs'
 
+import utils from '../utils/utils'
+
 import React from 'react'
 import Router from 'react-router'
 import { routes } from './front/routes'
@@ -19,21 +21,21 @@ module.exports = function(express, app) {
     res.send('haha');
   });
 
-  var modules = [
+  const modules = [
     {
-      name: 'orm', // Parse the models and make them available under app.models and app.repositories
+      name: 'orm',
       parameters: {
         path: config.path.models
       }
     },
     {
-      name: 'forms', // Load the definition of the forms in order to make them usable to parse some data
+      name: 'forms',
       parameters: {
         path: config.path.forms
       }
     },
     {
-      name: 'auth', // Enable a user system and authentificatoin (working with a bearer strategy)
+      name: 'auth',
       parameters: {
         userModel: 'user',
         routes: {
@@ -48,7 +50,7 @@ module.exports = function(express, app) {
       }
     },
     {
-      name: 'route', // Parse the routes that are available on the API side
+      name: 'route',
       parameters: {
         path: config.path.apiRoutes,
         urlPrefix: '/api'
@@ -59,7 +61,7 @@ module.exports = function(express, app) {
     }
   ];
 
-  return require(config.path.utils+"/utils").initialize(app, modules)
+  return utils.initialize(app, modules)
     .then(function(app){
       /* It must be done after the api has been made, in order not to override those routes */
       app.get('*', function(req, res) {

@@ -1,15 +1,15 @@
-var util = require('util')
-  , fs = require('fs')
-  , q = require('q')
-  , config = require('app-config')
-  , colors = require('colors');
+import util from 'util'
+import fs from 'fs'
+import q from 'q'
+import config from'app-config'
+import colors from 'colors'
 
 /* Get each model from the stores */
 function getModules(modulesPath, modules) {
-  var deferred = q.defer();
+  const deferred = q.defer();
   // Reading all files in the path
   fs.readdir(modulesPath, function(err, files) {
-    var name
+    let name
       , module;
 
     if(typeof modules === "undefined") {
@@ -43,8 +43,8 @@ function getModules(modulesPath, modules) {
 /* http://howtonode.org/promises */
 function promisify(nodeAsyncFn, context) {
   return function() {
-    var deferred = q.defer()
-      , args = Array.prototype.slice.call(arguments);
+    const deferred = q.defer();
+    let args = Array.prototype.slice.call(arguments);
 
     args.push(function(err, val) {
       if (err !== null) {
@@ -62,7 +62,7 @@ function promisify(nodeAsyncFn, context) {
 
 /* Makes the initialiasation of the modules in utils declarative */
 function initialize(app, modules) {
-  var deferred = q.defer();
+  const deferred = q.defer();
 
   function initializeAux(app, modules, promise) {
     if(modules.length === 0) {
@@ -70,7 +70,7 @@ function initialize(app, modules) {
         return app;
       });
     } else {
-      var module = modules.splice(0, 1)[0];
+      const module = modules.splice(0, 1)[0];
       return initializeAux(app, modules, promise.then(function() {
         console.log(("\nModule: "+module.name).grey);
         return require(config.path.utils+'/'+module.name).initialize(app, module.parameters);

@@ -1,14 +1,10 @@
-var q = require('q')
-  , colors = require('colors')
-  , config = require('app-config')
-  , utils = require(config.path.utils+'/utils')
-  , Waterline = require('waterline')
-  , Article = require(config.path.models+'/Article');
+import q from 'q'
+import Waterline from 'waterline'
+import colors from 'colors'
+import config from 'app-config'
+import utils from './utils'
 
 var orm = Waterline();
-
-// Get the config for the orm
-var config = require('app-config');
 
 // Load the Models into the ORM
 function loadModels(storesPath, callback) {

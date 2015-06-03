@@ -1,11 +1,11 @@
-var q = require('q')
-  , passport = require('passport')
-  , BasicStrategy = require('passport-http').BasicStrategy
-  , BearerStrategy = require('passport-http-bearer').Strategy
-  , bcrypt = require('bcrypt')
-  , forms = require(__dirname+'/forms')
-  , errorHandler = require(__dirname+'/errorHandler')
-  , colors = require('colors');
+import q from 'q'
+import passport from 'passport'
+import { BasicStrategy } from 'passport-http'
+import { Strategy as BearerStrategy } from 'passport-http-bearer'
+import bcrypt from 'bcrypt'
+import forms from './forms'
+import errorHandler from './errorHandler'
+import colors from 'colors'
 
 /**
  * Users currently logged in
@@ -15,10 +15,11 @@ var q = require('q')
 var _users = [];
 
 function findByToken(token) {
-  var deferred = q.defer();
+  const deferred = q.defer();
 
-  for(var i = 0, len = _users.length; i < len; i++) {
-    var user = _users[i];
+  let user;
+  for(let i = 0, len = _users.length; i < len; i++) {
+    user = _users[i];
     if(user.token === token) {
       if(user.expiresAt < (new Date())) {
         _users.splice(i, 1);
@@ -43,7 +44,7 @@ function findByToken(token) {
  * @return a token for the session of the user
  */
 function createUserSession(user) {
-  var expiresAt = new Date()
+  let expiresAt = new Date()
     , token = Math.random().toString(36).substr(2);
 
   expiresAt.setMonth(expiresAt.getMonth() + 1);
@@ -58,10 +59,11 @@ function createUserSession(user) {
 }
 
 function removeUserSession(user) {
-  var deferred = q.defer();
+  const deferred = q.defer();
 
-  for(var i = 0, len = _users.length; i < len; i++) {
-    var user = _users[i];
+  const token = user.token;
+  for(let i = 0, len = _users.length; i < len; i++) {
+    user = _users[i];
     if(user.token === token) {
       _users.splice(i, 1);
       i = -1;
@@ -80,12 +82,9 @@ function removeUserSession(user) {
 function initialize(app, parameters) {
   console.info("Loading auth...".underline);
   // Making sure that the user model is given as a parameter
-  var userModel;
-  if(typeof parameters.userModel !== "undefined") {
-    userModel = parameters.userModel;
-  } else {
+  if(typeof parameters.userModel === "undefined")
     throw new TypeError('userModel is undefined when initializing authentification');
-  }
+  const userModel = parameters.userModel;
 
   // initializing routes
   var routes = {
@@ -107,7 +106,7 @@ function initialize(app, parameters) {
     if(typeof parameters.forms.register !== "undefined") formsParam.register = parameters.forms.register;
   }
 
-  var deferred = q.defer();
+  const deferred = q.defer();
 
   app.use(passport.initialize());
   app.use(passport.session());

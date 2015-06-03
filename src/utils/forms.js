@@ -1,7 +1,7 @@
-var validate = require("validate.js")
-  , utils = require('./utils')
-  , config = require('app-config')
-  , colors = require('colors');
+import validate from "validate.js"
+import utils from './utils'
+import config from 'app-config'
+import colors from 'colors'
 
 function loadForms(app, path) {
   console.info("Loading forms...".underline);
@@ -16,7 +16,6 @@ function loadForms(app, path) {
       }
 
       for(name in modules) {
-        console.info(name);
         module = modules[name];
         forms[name] = function() {
           return (new Form(module));
@@ -48,13 +47,13 @@ Form.prototype.bind = function bind(req) {
   return data;
 }
 
-Form.prototype.validates = function validate() {
-  return this._fields.every(function(field) {
-    if(typeof this._validators === "undefined")
-      return true;
-    else
-      validate(this.data[field], this._validators[field]);
-  });
+Form.prototype.validates = function validates() {
+  this.errors = validate(this.data, this._validators);
+  if(typeof this.errors === "undefined") {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 function initialize(app, parameters){
