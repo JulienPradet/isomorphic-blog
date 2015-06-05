@@ -17,10 +17,7 @@ function fetchUrl(url, method) {
           deferred.resolve(JSON.parse(req.responseText));
         } else {
           // if error
-          deferred.reject({
-            status: req.status,
-            message: req.responseText
-          });
+          deferred.reject(JSON.parse(req.responseText));
         }
       }
     };

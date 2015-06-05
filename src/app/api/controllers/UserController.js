@@ -9,7 +9,7 @@ export function getUsers(req, res) {
       }))
     })
     .catch(function(error) {
-      throw Error(error);
+      throw InternalServerError(error);
     })
     .done();
 }

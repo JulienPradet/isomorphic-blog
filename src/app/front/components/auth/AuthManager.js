@@ -35,7 +35,11 @@ class AuthManager extends React.Component {
 
   render() {
     return (
-      <RouteHandler AuthActions={this.props.context.actions.auth} user={this.state.user} users={this.state.users} />
+      <RouteHandler
+          AuthActions={this.props.context.actions.auth}
+          AuthStore={this.props.context.stores.auth}
+          user={this.state.user}
+          users={this.state.users} />
     );
   }
 }

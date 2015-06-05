@@ -46,18 +46,18 @@ export default class Form extends React.Component {
     this.props.onSubmit(this.state);
   }
 
-  renderForm(path, element) {
+  renderForm(path, element, errors) {
     path.push(element.id);
     switch(element.type) {
       case 'fieldset':
-        return this.renderFieldset(path, element);
+        return this.renderFieldset(path, element, errors);
         break;
       default:
-        return this.renderInput(path, element)
+        return this.renderInput(path, element, errors)
     }
   }
 
-  renderFieldset(path, element) {
+  renderFieldset(path, element, error) {
     return (
       <fieldset key={element.id} class="form__fieldset">
         {element.fields.map((element) => this.renderForm.bind(this)(path, element))}
@@ -65,10 +65,16 @@ export default class Form extends React.Component {
     );
   }
 
-  renderInput(path, element) {
-    return (
-      <Input key={element.id} id={element.id} label={element.label} value={element.defaultValue} type={element.type} onChange={this.changeHandler.bind(this)(path)} />
-    );
+  renderInput(path, element, error) {
+    if(typeof error === "undefined") {
+      return (
+        <Input key={element.id} id={element.id} label={element.label} value={element.defaultValue} type={element.type} onChange={this.changeHandler.bind(this)(path)} />
+      );
+    } else {
+      return (
+        <Input key={element.id} id={element.id} label={element.label} value={element.defaultValue} type={element.type} error={error} onChange={this.changeHandler.bind(this)(path)} />
+      );
+    }
   }
 
   renderButton(button) {
@@ -78,12 +84,20 @@ export default class Form extends React.Component {
   }
 
   render() {
-    const fields = this.props.fields.map((element) => this.renderForm.bind(this)([], element));
+    const fields = this.props.fields.map((element) => {
+      if(typeof this.props.errors !== "undefined" && typeof this.props.errors[element.id] !== "undefined") {
+        return this.renderForm.bind(this)([], element, this.props.errors[element.id])
+      } else {
+        return this.renderForm.bind(this)([], element)
+      }
+    });
+
     const buttons = (
       typeof this.props.buttons !== "undefined" ?
         this.props.buttons.map(this.renderButton.bind(this)) :
         renderButton()
     );
+
     return (
       <form className="form" action={this.props.action} method={this.props.method} onSubmit={this.submit.bind(this)}>
         {fields}

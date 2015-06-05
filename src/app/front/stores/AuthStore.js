@@ -16,13 +16,18 @@ export default class AuthStore extends Store {
             this._users = payload.users;
             this.emitChange();
             break;
+          case this.constants.auth.FAILED_REGISTER:
+            this._registerError = payload.error;
+            this.emitChange();
+            break;
         }
       }
     );
 
     this.setInitData({
       user: {},
-      users: []
+      users: [],
+      _registerError: {}
     });
   }
 
@@ -32,5 +37,9 @@ export default class AuthStore extends Store {
 
   getUsers() {
     return this._users;
+  }
+
+  getRegisterErrors() {
+    return this._registerError;
   }
 }

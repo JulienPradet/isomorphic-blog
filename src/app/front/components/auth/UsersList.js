@@ -37,7 +37,7 @@ class UsersList extends React.Component {
 
     return (
       <div className="users">
-        <h1>Active users</h1>
+        <h1>Registered users</h1>
         <ul>
           {users}
         </ul>

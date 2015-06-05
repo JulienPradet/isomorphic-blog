@@ -5,6 +5,23 @@ export default class Input extends React.Component {
     this.props.onChange(event.target.value);
   }
 
+  renderError() {
+    let error;
+    if(typeof this.props.error !== "undefined") {
+      error = this.props.error.map((element) => {
+        return <li>{element}</li>
+      });
+    } else {
+      error = "";
+    }
+
+    return (
+      <div className="form__input__error">
+        <ul>{error}</ul>
+      </div>
+    );
+  }
+
   render() {
     function renderInput(type, id, defaultValue, onChange) {
       switch(type) {
@@ -33,6 +50,7 @@ export default class Input extends React.Component {
 
         <div className="form__input">
           {input}
+          {this.renderError()}
         </div>
       </div>
     );

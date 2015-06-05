@@ -21,35 +21,17 @@ export function initialize(app) {
 
   app.use(function(err, req, res, next) {
     if(err instanceof BadRequestError) {
-      res.status(400).json({
-        name: err.name,
-        message: err.message
-      });
+      res.status(400).json(err.message);
     } else if(err instanceof UnauthorizedError) {
-      res.status(401).json({
-        name: err.name,
-        message: err.message
-      });
+      res.status(401).json(err.message);
     } else if(err instanceof ForbiddenError) {
-      res.status(403).json({
-        name: err.name,
-        message: err.message
-      });
+      res.status(403).json(err.message);
     } else if(err instanceof NotFoundError) {
-      res.status(404).json({
-        name: err.name,
-        message: err.message
-      });
+      res.status(404).json(err.message);
     } else if(err instanceof InternalServerError) {
-      res.status(500).json({
-        name: err.name,
-        message: err.message
-      });
+      res.status(500).json(err.message);
     } else {
-      res.status(500).json({
-        name: err.name,
-        message: 'Nous avons tout cassé, désolé.'
-      });
+      res.status(500).json({message: 'Nous avons tout cassé, désolé.'});
     }
   });
 

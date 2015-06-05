@@ -30,37 +30,33 @@ export default class AuthDispatcher extends Dispatcher {
     });
   }
 
-  handleFailedLoadUsers(status, error) {
+  handleFailedLoadUsers(error) {
     this.dispatch({
       actionType: this.constants.auth.FAILED_LOADING_USERS,
-      status: status,
       error: error
     });
   }
 
   /* Register User */
-  handleFailedRegister(status, error) {
+  handleFailedRegister(error) {
     this.dispatch({
       actionType: this.constants.auth.FAILED_REGISTER,
-      status: status,
       error: error
     });
   }
 
   /* Login */
-  handleFailedLogin(status, error) {
+  handleFailedLogin(error) {
     this.dispatch({
       actionType: this.constants.auth.FAILED_LOGIN,
-      status: status,
       error: error
     });
   }
 
   /* Logout */
-  handleFailedLogout(status, error) {
+  handleFailedLogout(error) {
     this.dispatch({
       actionType: this.constants.auth.FAILED_LOGOUT,
-      status: status,
       error: error
     });
   }

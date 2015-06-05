@@ -34,7 +34,7 @@ export default class Register extends React.Component {
     ];
 
     return (
-      <Form method="POST" action="/register" fields={fields} buttons={buttons} onSubmit={this.register.bind(this)} ></Form>
+      <Form method="POST" action="/register" fields={fields} errors={this.props.AuthStore.getRegisterErrors()} buttons={buttons} onSubmit={this.register.bind(this)} ></Form>
     );
   }
 }
