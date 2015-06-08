@@ -9,12 +9,33 @@ export default class Form extends React.Component {
   }
 
   changeHandler(path) {
-    function push(obj, path, value) {
+    function getDefaultValue(path, fields) {
+      if(path.length === 0) {
+        return;
+      } else {
+        for(let i = 0, len = fields.length; i < len; i++) {
+          if(fields[i].id === path[0]) {
+            if(path.length > 1) {
+              path.splice(0, 1);
+              return getDefaultValue(path, fields[i].fields);
+            } else {
+              return fields[i].defaultValue;
+            }
+          }
+        }
+      }
+    }
+
+    function push(obj, path, value, defaultValue) {
       if(typeof obj === "undefined") obj = {};
       if(path.length <= 0) {
         throw new Error('invalid path');
       } else if(path.length === 1) {
-        obj[path[0]] = value;
+        if(typeof value !== "undefined" && value !== "") {
+          obj[path[0]] = value;
+        } else if(typeof obj[path[0]] !== "undefined" && value === "") {
+          obj[path[0]] = defaultValue;
+        }
       } else {
         obj[path[0]] = push(obj[path[0]], path.slice(0, 1), value);
       }
@@ -22,7 +43,8 @@ export default class Form extends React.Component {
     }
 
     return (function(value) {
-      const state = push(this.state, path, value);
+      const defaultValue = getDefaultValue(path, this.props.fields);
+      const state = push(this.state, path, value, defaultValue);
       this.setState(state);
     }).bind(this);
   }
@@ -68,11 +90,11 @@ export default class Form extends React.Component {
   renderInput(path, element, error) {
     if(typeof error === "undefined") {
       return (
-        <Input key={element.id} id={element.id} label={element.label} value={element.defaultValue} type={element.type} onChange={this.changeHandler.bind(this)(path)} />
+        <Input key={element.id} id={element.id} label={element.label} defaultValue={element.defaultValue} type={element.type} onChange={this.changeHandler.bind(this)(path)} />
       );
     } else {
       return (
-        <Input key={element.id} id={element.id} label={element.label} value={element.defaultValue} type={element.type} error={error} onChange={this.changeHandler.bind(this)(path)} />
+        <Input key={element.id} id={element.id} label={element.label} defaultValue={element.defaultValue} type={element.type} error={error} onChange={this.changeHandler.bind(this)(path)} />
       );
     }
   }
@@ -108,6 +130,6 @@ export default class Form extends React.Component {
 }
 
 Form.propTypes = {
-  method: React.PropTypes.oneOf(['POST', 'PUT', 'DELETE']).isRequired,
+  method: React.PropTypes.oneOf(['GET', 'POST', 'PUT', 'DELETE']).isRequired,
   action: React.PropTypes.string.isRequired
 }

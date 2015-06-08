@@ -22,6 +22,11 @@ function fetchUrl(url, method) {
       }
     };
 
+    setTimeout(function() {
+      req.abort();
+      deferred.reject();
+    }, 5000);
+
     // Launch request
     if(data === null || typeof data === "undefined") {
       req.send(null);

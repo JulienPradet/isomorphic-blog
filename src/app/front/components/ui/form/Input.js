@@ -23,24 +23,24 @@ export default class Input extends React.Component {
   }
 
   render() {
-    function renderInput(type, id, defaultValue, onChange) {
+    function renderInput(type, id, onChange) {
       switch(type) {
         case 'text':
           return (
-            <input type="text" name={id} id={id} value={defaultValue} onChange={onChange} />
+            <input type="text" name={id} id={id} onChange={onChange} />
           );
           break;
         case 'password':
           return(
-            <input type="password" name={id} id={id} value={defaultValue} onChange={onChange} />
+            <input type="password" name={id} id={id} onChange={onChange} />
           );
         case 'email':
           return(
-            <input type="email" name={id} id={id} value={defaultValue} onChange={onChange} />
+            <input type="email" name={id} id={id} onChange={onChange} />
           );
       }
     }
-    const input = renderInput(this.props.type, this.props.id, this.props.defaultValue, this.change.bind(this));
+    const input = renderInput.bind(this)(this.props.type, this.props.id, this.change.bind(this));
 
     return (
       <div className="form__group">

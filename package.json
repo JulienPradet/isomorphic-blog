@@ -28,6 +28,7 @@
     "ejs": "^2.3.1",
     "express": "4.12.x",
     "express-session": "^1.11.2",
+    "include-all": "^0.1.6",
     "mongodb": "^2.0.32",
     "object-path": "^0.9.2",
     "passport": "^0.2.2",
@@ -40,8 +41,7 @@
     "slug": "^0.9.1",
     "validate.js": "^0.7.1",
     "waterline": "^0.10.21",
-    "xhr2": "^0.1.2",
-    "include-all": "^0.1.6"
+    "xhr2": "^0.1.2"
   },
   "devDependencies": {
     "babelify": "^6.1.2",
