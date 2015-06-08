@@ -7,6 +7,13 @@ export default class AuthDispatcher extends Dispatcher {
   }
 
   /* Refresh User */
+  handleNewAuthToken(token) {
+    this.dispatch({
+      actionType: this.constants.auth.NEW_TOKEN,
+      token: token
+    });
+  }
+
   handleRefreshCurrentUser(user) {
     this.dispatch({
       actionType: this.constants.auth.REFRESH_CURRENT_USER,
@@ -14,9 +21,9 @@ export default class AuthDispatcher extends Dispatcher {
     });
   }
 
-  handleFailedLoadUser(status, error) {
+  handleFailedLoadCurrentUser(status, error) {
     this.dispatch({
-      actionType: this.constants.auth.FAILED_LOADING_USER,
+      actionType: this.constants.auth.FAILED_LOADING_CURRENT_USER,
       status: status,
       error: error
     });

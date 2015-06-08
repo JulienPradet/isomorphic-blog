@@ -39,7 +39,8 @@ class AuthManager extends React.Component {
           AuthActions={this.props.context.actions.auth}
           AuthStore={this.props.context.stores.auth}
           user={this.state.user}
-          users={this.state.users} />
+          users={this.state.users}
+          token={this.state.token} />
     );
   }
 }
@@ -49,8 +50,7 @@ export default bindData(
   AuthManager,
   {
     auth: {
-      users: AuthFetchers.refreshUsers,
-      user: AuthFetchers.refreshUser
+      users: AuthFetchers.refreshUsers
     }
   }
 );

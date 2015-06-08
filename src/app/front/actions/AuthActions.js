@@ -1,5 +1,6 @@
 import Actions from './Actions'
 import fetchers from '../fetchers/AuthFetchers'
+import { setToken } from '../fetchData'
 
 export default class AuthActions {
   constructor(dispatchers, constants) {
@@ -7,16 +8,15 @@ export default class AuthActions {
     this.constants = constants;
   }
 
-  loadUser() {
+  loadCurrentUser() {
     const dispatchers = this.dispatchers;
-    fetchers.refreshUser()
+    fetchers.getCurrentUser()
       .then(function(user) {
-        dispatchers.auth.handleRefreshCurrentUser(user);
+        dispatchers.auth.handleRefreshCurrentUser(data.user);
       })
       .catch(function(error) {
-        dispatchers.auth.handleFailedLoadUser(error);
+        dispatchers.auth.handleFailedLoadCurrentUser(error);
       })
-      .done();
   }
 
   loadUsers() {
@@ -46,8 +46,10 @@ export default class AuthActions {
   login(user) {
     const dispatchers = this.dispatchers;
     fetchers.login(user)
-      .then(function(user) {
-        dispatchers.auth.handleRefreshCurrentUser(user);
+      .then(function(data) {
+        console.log(setToken);
+        setToken(data.token);
+        dispatchers.auth.handleRefreshCurrentUser(data.user);
       })
       .catch(function(error) {
         dispatchers.auth.handleFailedLogin(error);
@@ -58,8 +60,9 @@ export default class AuthActions {
   logout() {
     const dispatchers = this.dispatchers;
     fetchers.logout()
-      .then(function(user) {
-        dispatchers.auth.handleRefreshCurrentUser(user);
+      .then(function() {
+        dispatchers.auth.handleRefreshCurrentUser();
+        setToken(null);
       })
       .catch(function(error) {
         dispatchers.auth.handleFailedLogout(error);

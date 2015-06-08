@@ -1,5 +1,5 @@
 import utils from './utils'
-import auth from './auth'
+import * as auth from './auth'
 import colors from 'colors'
 import config from 'app-config'
 import csrf from 'csurf'
@@ -21,19 +21,7 @@ function addRouterToApp(app, router, urlPrefix) {
 
   // Handling security
   if(router.hasOwnProperty('security')) {
-    let options = {};
-    // Getting the options for the security
-    if(router.hasOwnProperty('options')) {
-      options = router.options;
-    }
-    // Adding the middleware to the stack
-    app[method](path, auth.middleware.authenticate);
-    app[method](path, auth.middleware.checkAuthorization(router.security, options));
-
-    // CSRF protection
-    if(router.hasOwnProperty('csrf')) {
-      app[method](path, csrfProtection);
-    }
+    app = auth.addSecurityMiddlewares(app, method, path, router.security);
   }
 
   if(router.hasOwnProperty('handler')) {

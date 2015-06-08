@@ -3,7 +3,7 @@ import Form from './../ui/form/Form'
 
 export default class Logout extends React.Component {
   login(values) {
-    this.props.AuthActions.login(values);
+    this.props.AuthActions.logout(values);
   }
 
   render() {
@@ -15,8 +15,10 @@ export default class Logout extends React.Component {
       }
     ];
 
+    const fields = [];
+
     return (
-      <Form method="POST" action="/login" fields={fields} buttons={buttons} onSubmit={this.login.bind(this)} ></Form>
+      <Form method="POST" action="/logout" fields={fields} buttons={buttons} onSubmit={this.login.bind(this)} ></Form>
     );
   }
 }

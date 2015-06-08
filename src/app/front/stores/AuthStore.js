@@ -8,6 +8,10 @@ export default class AuthStore extends Store {
       function(payload) {
         let actionType = payload.actionType;
         switch(actionType) {
+          case this.constants.auth.NEW_TOKEN:
+            this._token = payload.token;
+            this.emitChange();
+            break;
           case this.constants.auth.REFRESH_CURRENT_USER:
             this._user = payload.user;
             this.emitChange();

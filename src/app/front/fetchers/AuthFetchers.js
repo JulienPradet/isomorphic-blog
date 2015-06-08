@@ -1,17 +1,8 @@
 import FetchData from '../fetchData.js'
 
 export default {
-  refreshUser: function refreshUser() {
-    return FetchData.users.getUsers()
-      .then(function(users) {
-        let user;
-        if(users.length > 0) {
-          user = users[0];
-        } else {
-          user = {};
-        }
-        return user;
-      });
+  getCurrentUser: function getCurrentUser() {
+    return FetchData.auth.currentUser();
   },
 
   refreshUsers: function refreshUsers() {

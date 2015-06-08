@@ -5,5 +5,9 @@ body {
   color: $color;
 }
 
+ul {
+  margin: 0;
+}
+
 @import "ui/_layout.scss";
 @import "ui/_form.scss";

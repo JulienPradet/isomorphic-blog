@@ -35,21 +35,30 @@ class UserStatus extends React.Component {
     this.props.context.stores.auth.removeChangeListener(this._onChange.bind(this));
   }
 
+  refreshUser() {
+    this.props.context.actions.auth.loadCurrentUser(this.state.token);
+  }
+
   render() {
     let content;
-    if(typeof this.props.user === "undefined" || typeof this.props.user.username === "undefined") {
+
+    const refreshUser = <button type="button" onClick={this.refreshUser.bind(this)}>Refresh User</button>;
+
+    if(typeof this.state.user === "undefined" || typeof this.state.user.username === "undefined") {
       return (
         <Panel type="full">
           Welcome to my blog !
           <Login AuthActions={this.props.context.actions.auth} />
           <Link to="login">{"Se connecter"}</Link> <Link to="register">{"S'inscrire"}</Link>
+          {refreshUser}
         </Panel>
       );
     } else {
       return (
         <Panel type="full">
-          Hello <Link to="userStatus"><Username user={this.props.user} /></Link> !
+          Hello <Link to="logout"><Username user={this.state.user} /></Link> !
           <Link to="logout">Logout</Link>
+          {refreshUser}
         </Panel>
       )
     }
@@ -61,7 +70,7 @@ export default bindData(
   UserStatus,
   {
     auth: {
-      user: AuthFetchers.refreshUser
+      users: AuthFetchers.getCurrentUser
     }
   }
 );

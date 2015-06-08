@@ -1,5 +1,6 @@
 import q from 'q'
 import passport from 'passport'
+import LocalStrategy from 'passport-local'
 import { BasicStrategy } from 'passport-http'
 import { Strategy as BearerStrategy } from 'passport-http-bearer'
 import bcrypt from 'bcrypt'
@@ -7,42 +8,36 @@ import forms from './forms'
 import errorHandler from './errorHandler'
 import colors from 'colors'
 
-/**
- * Users currently logged in
- * @type {Array} contains the user id, his token and the roles assigned to him
- * @todo it'd be better to switch to a database to be stateless (for instance redis since it's memcached)
- */
+
 var _users = [];
 
 function findByToken(token) {
   const deferred = q.defer();
 
-  let user;
-  for(let i = 0, len = _users.length; i < len; i++) {
-    user = _users[i];
-    if(user.token === token) {
-      if(user.expiresAt < (new Date())) {
-        _users.splice(i, 1);
-      } else {
-        deferred.resolve(user);
-        i = -1;
-        break;
+  process.nextTick(function() {
+    let user, i;
+    const len = _users.length;
+    for(i = 0; i < len; i++) {
+      user = _users[i];
+      if(user.token === token) {
+        if(user.expiresAt < (new Date())) {
+          _users.splice(i, 1);
+        } else {
+          deferred.resolve(user);
+          i = -1;
+          break;
+        }
       }
     }
-  }
 
-  if(i !== -1) {
-    deferred.reject();
-  }
+    if(i !== -1) {
+      deferred.reject();
+    }
+  });
 
   return deferred.promise;
 }
 
-/**
- * Authentificate user to allow him to connect by tokens
- * @param {Array} array of roles the user is allowed to
- * @return a token for the session of the user
- */
 function createUserSession(user) {
   let expiresAt = new Date()
     , token = Math.random().toString(36).substr(2);
@@ -52,7 +47,7 @@ function createUserSession(user) {
   _users.push({
     token: token,
     expiresAt: expiresAt,
-    roles: user.roles
+    roles: (typeof user.roles !== "undefined" ? user.roles : [])
   });
 
   return token;
@@ -61,50 +56,35 @@ function createUserSession(user) {
 function removeUserSession(user) {
   const deferred = q.defer();
 
-  const token = user.token;
-  for(let i = 0, len = _users.length; i < len; i++) {
-    user = _users[i];
-    if(user.token === token) {
-      _users.splice(i, 1);
-      i = -1;
-      deferred.resolve();
-      break;
+  process.nextTick(function() {
+    const token = user.token;
+    const len = _users.length;
+    let i;
+    for(i = 0; i < len; i++) {
+      user = _users[i];
+      if(user.token === token) {
+        _users.splice(i, 1);
+        i = -1;
+        deferred.resolve();
+        break;
+      }
     }
-  }
 
-  if(i !== -1) {
-    deferred.reject('User is not logged in');
-  }
+    if(i !== -1) {
+      deferred.reject('User is not logged in');
+    }
+  })
 
   return deferred.promise;
 }
 
 function initialize(app, parameters) {
   console.info("Loading auth...".underline);
+
   // Making sure that the user model is given as a parameter
   if(typeof parameters.userModel === "undefined")
     throw new TypeError('userModel is undefined when initializing authentification');
   const userModel = parameters.userModel;
-
-  // initializing routes
-  var routes = {
-    login: '/login',
-    logout: '/logout',
-    register: '/register'
-  };
-  if(typeof parameters.routes !== "undefined"){
-    if(typeof parameters.routes.login !== "undefined") routes.login = parameters.routes.login;
-    if(typeof parameters.routes.logout !== "undefined") routes.logout = parameters.routes.logout;
-    if(typeof parameters.routes.register !== "undefined") routes.register = parameters.routes.register;
-  }
-
-  // initializing forms
-  var formsParam = {
-    register: 'register'
-  };
-  if(typeof parameters.forms !== "undefined"){
-    if(typeof parameters.forms.register !== "undefined") formsParam.register = parameters.forms.register;
-  }
 
   const deferred = q.defer();
 
@@ -112,25 +92,31 @@ function initialize(app, parameters) {
   app.use(passport.session());
 
   console.info("stategies...");
+
+  function checkUser(username, password, done) {
+    app.models[userModel].findOne({username: username}, function(err, user) {
+      if (err) { return done(err); }
+      if (!user) { return done(null, false); }
+      bcrypt.compare(password, user.password, function(err, res) {
+        if(err || !res) {
+          return done(null, false);
+        } else {
+          delete user.password;
+          return done(null, user);
+        }
+      })
+    });
+  }
+
+  /**
+   * Local Strategy
+   */
+  passport.use(new LocalStrategy(checkUser));
+
   /**
   * BasicStrategy
-  * This strategy is used to protect the token endpoint
   */
-  passport.use(new BasicStrategy(
-    function(username, password, done) {
-      app.models[userModel].findOne({username: username}, function(err, user) {
-        if (err) { return done(err); }
-        if (!user) { return done(null, false); }
-        bcrypt.compare(password, user.password, function(err, res) {
-          if(err || !res) {
-            return done(null, false);
-          } else {
-            return done(null, user);
-          }
-        })
-      });
-    }
-  ));
+  passport.use(new BasicStrategy(checkUser));
 
   /**
   * BearerStrategy
@@ -140,6 +126,7 @@ function initialize(app, parameters) {
     function(token, done) {
       findByToken(token)
         .then(function(user) {
+          console.error(user);
           done(null, user);
         })
         .catch(function(error) {
@@ -150,100 +137,29 @@ function initialize(app, parameters) {
     }
   ));
 
-  console.info("routes...");
-  /* Adding the login/register routes */
-  app.post(
-    routes.register,
-    alreadyLoggedIn, // Make sure that the user is not already logged in
-    function(req, res, next) {
-      var registerForm = app.forms[formsParam.register]();
-      registerForm.bind(req);
-      if(registerForm.validates()) {
-        app.repositories[userModel].createUser(
-          registerForm.data.username,
-          registerForm.data.password,
-          registerForm.data.email
-        )
-          .then(function(user) {
-            delete user.password;
-            res.json(user);
-          })
-          .catch(function(err) {
-            next();
-          })
-          .done();
-      }
-  });
-
-  app.post(
-    routes.login,
-    alreadyLoggedIn, // Make sure that the user is not already logged in
-    passport.authenticate('basic', {session: false}),
-    function(req, res) {
-      var token = createUserSession(req.user);
-      res.json({
-        token: token
-      });
-    }
-  );
-
-  app.post(
-    routes.logout,
-    passport.authenticate('bearer', {session: false}),
-    function(req, res) {
-      removeUserSession(app.user)
-        .then(function() {
-          res.json({
-            message: "Deconnected"
-          })
-        })
-        .catch(function() {
-          throw new errorHandler.ForbiddenError('You are not logged in');
-        })
-        .done();
-    }
-  );
-
   console.info("Done".green);
   deferred.resolve(app);
 
   return deferred.promise;
-
 }
 
 function hasRole(role, user) {
   return user.roles.indexOf(role) > -1;
 }
 
-function checkAuthorization(security, options) {
-  return function checkAuthorization(req, res, next) {
-    // You don't have to be logged
-    if(security.hasOwnProperty('logged') && !security.logged) {
+function checkRoles(roles) {
+  return function checkRoles(req, res, next) {
+    // You match one of those roles
+    if(roles.some(function(role) { hasRole(role, req.user) })) {
       next();
+    // You dont match those roles
     } else {
-      // You have to be logged, but the user is anonymous
-      if((security.logged || security.roles) && !req.user) {
-        throw new errorHandler.UnauthorizedError('You must be logged in.');
-      } else {
-        // You have to be logged, and match some roles
-        if(security.hasOwnProperty('roles')) {
-          // You match one of those roles
-          if(security.roles.some(function(role) { hasRole(role, req.user) })) {
-            next();
-          // You dont match those roles
-          } else {
-            throw new errorHandler.UnauthorizedError('You don\'t have the permission to do that.');
-          }
-        // You only have to be logged (no roles), and you are
-        } else {
-          next();
-        }
-      }
+      throw new errorHandler.UnauthorizedError('You don\'t have the permission to do that.');
     }
   };
 }
 
-function alreadyLoggedIn(req, res, next) {
+function isNotLoggedIn(req, res, next) {
   if(req.user) {
     throw new errorHandler.ForbiddenError('Already logged in');
   } else {
@@ -251,11 +167,37 @@ function alreadyLoggedIn(req, res, next) {
   }
 }
 
-module.exports = {
-  initialize: initialize,
-  middleware: {
-    authenticate: passport.authenticate('bearer', {session: false}),
-    checkAuthorization: checkAuthorization,
-    alreadyLoggedIn: alreadyLoggedIn
+const middleware = {
+  local: function() { return passport.authenticate('local', {session: false}); },
+  basic: function() { return passport.authenticate('basic', {session: false}); },
+  bearer: function() { return passport.authenticate('bearer', {session: false}); },
+  checkRoles: checkRoles,
+  isNotLoggedIn:function() { return isNotLoggedIn; }
+};
+
+function _mapValues(object, callback) {
+  for(var key in object) {
+    if(object.hasOwnProperty(key)) {
+      callback.bind(this)(key, object[key]);
+    }
   }
+}
+
+function addSecurityMiddlewares(app, method, path, security) {
+  _mapValues(security, function(authName, args) {
+    if(!middleware.hasOwnProperty(authName)) {
+      throw new Error('Security middleware "'+authName+'" does not exist.');
+    } else {
+      app[method](path, middleware[authName].apply(this, args));
+    }
+  });
+
+  return app;
+}
+
+export default {
+  initialize: initialize,
+  addSecurityMiddlewares: addSecurityMiddlewares,
+  createUserSession: createUserSession,
+  removeUserSession: removeUserSession
 };

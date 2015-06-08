@@ -1,6 +1,5 @@
 import q from 'q'
 import colors from 'colors'
-import connectDomain from 'connect-domain'
 
 class HttpResponseError extends Error {
   constructor(message) {
@@ -27,6 +26,7 @@ export function errorHandler(err, req, res, next) {
   } else if(err instanceof InternalServerError) {
     res.status(500).json(err.message);
   } else {
+    console.stack(err);
     res.status(500).json({message: 'It\'s broken. Ouch.'});
   }
 }
@@ -36,7 +36,6 @@ export function initialize(app) {
   const deferred = q.defer();
   console.info("Loading errorHandler...".underline);
 
-  app.use(connectDomain());
   app.use(errorHandler);
 
   console.info("Done".green);
